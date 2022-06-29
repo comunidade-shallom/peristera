@@ -2,9 +2,17 @@
 
 version: '3'
 
+vars:
+  PRODUCTION_WEBHOOK: https://comunidade-shallom-bot.deno.dev
+
 dotenv: ['.env']
 
 tasks:
+  webhook:setup:
+    silent: true
+    cmds:
+      - curl -X GET https://api.telegram.org/bot$TELEGRAM_TOKEN/setWebhook?url={{ .PRODUCTION_WEBHOOK }}/$TELEGRAM_TOKEN | jq
+
   poll:
     silent: true
     cmds:

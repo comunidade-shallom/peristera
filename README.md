@@ -10,6 +10,18 @@
 
 ## Development
 
-```
+```sh
 task pool
+```
+
+## Deploy
+
+Just commit into `master` branch.
+
+### Webhook
+
+To define telegram webhook, you must run
+
+```sh
+task webhook:setup
 ```
