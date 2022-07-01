@@ -1,0 +1,69 @@
+project_name: peristera
+
+before:
+  hooks:
+    - go mod tidy
+    - go generate ./...
+
+builds:
+  - dir: ./apps/cli/
+    hooks:
+      post:
+        - upx "{{ .Path }}"
+    ldflags:
+      - -s
+      - -w
+      - -extldflags=-static
+      - -X github.com/comunidade-shallom/peristera/pkg/config.commit={{.Branch}}@{{.ShortCommit}}
+      - -X github.com/comunidade-shallom/peristera/pkg/config.version={{.Summary}}
+      - -X github.com/comunidade-shallom/peristera/pkg/config.buildDate={{.Date}}
+      - -X github.com/comunidade-shallom/peristera/pkg/config.notes={{.ReleaseURL}}
+    flags:
+      - -a
+      - -installsuffix=cgo
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+
+  - id: win_x64
+    dir: ./apps/cli/
+    ldflags:
+      - -s
+      - -w
+      - -extldflags=-static
+    flags:
+      - -a
+      - -installsuffix=cgo
+    env:
+      - CGO_ENABLED=0
+    goarch:
+      - amd64
+    goos:
+      - windows
+
+archives:
+  - format: binary
+    replacements:
+      darwin: Darwin
+      linux: Linux
+      windows: Windows
+      386: i386
+      amd64: x86_64
+
+checksum:
+  name_template: 'checksums.txt'
+
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+
+release:
+  draft: true
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'

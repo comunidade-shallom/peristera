@@ -1,0 +1,88 @@
+# https://taskfile.dev
+
+version: '3'
+
+vars:
+  PKG_NAME: github.com/comunidade-shallom/peristera
+  APP_BASE_NAME: peristera
+  DIR_DIST: ./bin
+  BUILD_DATE: '{{now | date "2006-01-02T15:04:05"}}'
+  APP_VERSION:
+    sh: git describe --dirty --always --tags
+  GIT_HASH:
+    sh: git log -n 1 --format=%h | echo "unknow"
+
+
+dotenv: ['.env']
+
+tasks:
+  install:
+    desc: Install dependencies
+    cmds:
+      - go get ./...
+      - go mod vendor
+
+  setup:
+    desc: Setup project dependencies
+    deps:
+      - install
+    cmds:
+      - curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin
+
+  run:cli:
+    desc: Run CLI
+    cmds:
+      - go run ./apps/cli/ {{.CLI_ARGS}}
+
+  check:
+    desc: Check source code
+    cmds:
+      - go fmt ./...
+      - go vet ./...
+      - golangci-lint run ./...
+
+  clean:
+    desc: Remove old binaries
+    cmds:
+      - rm -rf {{.DIR_DIST}}/{{.APP_BASE_NAME}}-*
+
+  build:
+    desc: Build CLI (linux by default)
+    cmds:
+      - echo "Generating {{.BIN_NAME}}"
+      - "{{.EXTRA_ENVS}} go build {{.BUILDFLAGS}} {{.LDFLAGS}} -o {{.DIR_DIST}}/{{.BIN_NAME}} ./apps/{{.APP}}"
+      - chmod +x {{.DIR_DIST}}/{{.BIN_NAME}}
+    vars:
+      LDFLAGS: -ldflags "-X {{.PKG_NAME}}/pkg/config.commit={{.GIT_HASH}} -X {{.PKG_NAME}}/pkg/config.version={{.APP_VERSION}} -X {{.PKG_NAME}}/pkg/config.buildDate={{.BUILD_DATE}}"
+      APP: '{{default "cli" .APP}}'
+      GOOS: '{{default "linux" .GOOS}}'
+      GOARCH: '{{default "amd64" .GOARCH}}'
+      CGO_ENABLED: '{{default 0 .CGO_ENABLED}}'
+      BIN_NAME: '{{.APP_BASE_NAME}}-{{.APP}}-{{.GOOS}}-{{.GOARCH}}'
+    env:
+      GOOS: "{{.GOOS}}"
+      GOARCH: "{{.GOARCH}}"
+      GOARM: "{{.GOARM}}"
+      CGO_ENABLED: "{{.CGO_ENABLED}}"
+
+  production:linux:
+    desc: production build for Linux OS
+    cmds:
+      - task: build
+        vars:
+          UPX: yes
+          GOOS: linux
+          BUILDFLAGS: -a -installsuffix cgo -ldflags '-s -w -extldflags "-static"'
+
+  production:
+    desc: Production build for all platforms
+    deps: [ production:linux ]
+    cmds:
+      - cd {{.DIR_DIST}} && ls -lh | tr -s ' ' | cut -d ' ' -f 5,9-
+      - find -iname '{{.APP_BASE_NAME}}-*' -execdir upx {} \;
+      - cd {{.DIR_DIST}} && ls -lh | tr -s ' ' | cut -d ' ' -f 5,9-
+
+  release:snapshot:
+    desc: release snapshot mode
+    cmds:
+      - goreleaser release --snapshot --rm-dist

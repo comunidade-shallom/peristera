@@ -1,0 +1,34 @@
+# Logs
+.idea
+logs
+*.log
+
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# vscode
+.vscode/*
+!.vscode/extensions.json
+
+vendor
+dist
+.idea
+
+# Bin folder
+bin/*
+!bin/.gitkeep
+
+# outputs folder
+outputs/**
+!outputs/*/.gitkeep
+
+.env
+*.db
+*.sqlite
+
+# config
+peristera.yml

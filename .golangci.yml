@@ -1,0 +1,30 @@
+linters:
+  disable:
+    - wrapcheck
+    - tagliatelle
+    - exhaustivestruct
+    - exhaustruct
+    - gochecknoglobals
+    - forbidigo
+
+  presets:
+    - bugs
+    - comment
+    - complexity
+    - error
+    - format
+    - import
+    - metalinter
+    - module
+    - performance
+    - sql
+    - style
+    - test
+    - unused
+
+# linters-settings:
+#   exhaustruct:
+#     exclude:
+#       - 'cli\.*Flag'
+#       - 'cli\.Command'
+#       - 'cli\.App'
