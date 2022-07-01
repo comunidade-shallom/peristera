@@ -16,7 +16,7 @@ func WithKillSignal(ctx context.Context) (context.Context, context.CancelFunc) {
 		kill := make(chan os.Signal, 1)
 		signal.Notify(kill, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
-		// sig := <-kill
+		<-kill
 
 		// logger := zerolog.Ctx(ctx)
 		// logger.Warn().Msgf("OS Signal (%s)", sig.String())

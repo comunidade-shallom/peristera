@@ -8,6 +8,7 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/pterm/pterm v0.12.42
 	github.com/urfave/cli/v2 v2.10.3
+	gopkg.in/telebot.v3 v3.0.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 

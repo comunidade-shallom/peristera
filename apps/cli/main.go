@@ -5,6 +5,7 @@ import (
 	"os"
 	"sort"
 
+	"github.com/comunidade-shallom/peristera/apps/cli/worker"
 	"github.com/comunidade-shallom/peristera/pkg/config"
 	"github.com/comunidade-shallom/peristera/pkg/support"
 	"github.com/comunidade-shallom/peristera/pkg/support/errors"
@@ -31,7 +32,7 @@ func main() {
 				Usage: "Enable debug mode",
 			},
 		},
-		Commands: []*cli.Command{},
+		Commands: []*cli.Command{worker.Worker},
 		Before: func(ctx *cli.Context) error {
 			pterm.Debug.Debugger = !ctx.Bool("debug")
 

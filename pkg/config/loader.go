@@ -15,9 +15,10 @@ import (
 )
 
 var (
-	ErrFailToLoadConfig  = errors.System(nil, "fail to load config", "CONF:001")
-	ErrFailEnsureConfig  = errors.System(nil, "fail to ensure config", "CONF:002")
-	ConfigFileWasCreated = errors.Business("a new config file was created (%s)", "CONF:003")
+	ErrFailToLoadConfig     = errors.System(nil, "fail to load config", "CONF:001")
+	ErrFailEnsureConfig     = errors.System(nil, "fail to ensure config", "CONF:002")
+	ConfigFileWasCreated    = errors.Business("a new config file was created (%s)", "CONF:003")
+	ErrMissingTelegramToken = errors.System(nil, "missing telegram token", "CONF:004")
 )
 
 func Load(file string) (AppConfig, error) {
@@ -67,9 +68,14 @@ func Load(file string) (AppConfig, error) {
 	return applyDefaults(cfg)
 }
 
-//nolint:cyclop
 func applyDefaults(cfg AppConfig) (AppConfig, error) {
-	// pwd, _ := os.Getwd()
+	if cfg.TelegramToken == "" {
+		cfg.TelegramToken = os.Getenv("TELEGRAM_TOKEN")
+	}
+
+	if cfg.TelegramToken == "" {
+		return cfg, ErrMissingTelegramToken
+	}
 
 	return cfg, nil
 }
