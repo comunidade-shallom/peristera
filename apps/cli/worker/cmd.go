@@ -6,7 +6,7 @@ import (
 	"github.com/comunidade-shallom/peristera/pkg/telegram"
 	"github.com/pterm/pterm"
 	"github.com/urfave/cli/v2"
-	tele "gopkg.in/telebot.v3"
+	"gopkg.in/telebot.v3"
 )
 
 var Worker = &cli.Command{
@@ -18,7 +18,6 @@ var Worker = &cli.Command{
 		pterm.Debug.Println("Creating bot instance")
 
 		bot, err := telegram.NewBot(cfg)
-
 		if err != nil {
 			return err
 		}
@@ -34,7 +33,7 @@ var Worker = &cli.Command{
 
 		pterm.Info.Println("Starting bot...")
 
-		bot.OnError = func(err error, _ tele.Context) {
+		bot.OnError = func(err error, _ telebot.Context) {
 			pterm.Error.Println(err.Error())
 		}
 

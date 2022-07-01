@@ -30,11 +30,19 @@ tasks:
     cmds:
       - curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin
 
+  install:gofumpt:
+    desc: Install dependencies
+    status:
+      - test -f $(go env GOPATH)/bin/gofumpt
+    cmds:
+      - go install mvdan.cc/gofumpt@latest
+
   setup:
     desc: Setup project dependencies
     deps:
       - install
       - install:lint
+      - install:gofumpt
 
   run:cli:
     desc: Run CLI

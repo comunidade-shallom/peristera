@@ -20,9 +20,9 @@ func NewBot(cfg config.AppConfig) (*tele.Bot, error) {
 		return bot, err
 	}
 
-	bot.Handle("/hello", func(c tele.Context) error {
-		return c.Send("Hello!")
-	})
+	handlers := Handler{cfg: cfg}
+
+	bot.Handle("/me", handlers.Me)
 
 	return bot, nil
 }
