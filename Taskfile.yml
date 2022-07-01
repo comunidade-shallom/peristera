@@ -21,13 +21,20 @@ tasks:
     cmds:
       - go get ./...
       - go mod vendor
+      - go mod tidy
+
+  install:lint:
+    desc: Install dependencies
+    status:
+      - test -f $(go env GOPATH)/bin/golangci-lint
+    cmds:
+      - curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin
 
   setup:
     desc: Setup project dependencies
     deps:
       - install
-    cmds:
-      - curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin
+      - install:lint
 
   run:cli:
     desc: Run CLI
