@@ -2,6 +2,7 @@ package config
 
 import (
 	goErrors "errors"
+	"fmt"
 	"os"
 	"path"
 	"path/filepath"
@@ -19,6 +20,7 @@ var (
 	ErrFailEnsureConfig     = errors.System(nil, "fail to ensure config", "CONF:002")
 	ConfigFileWasCreated    = errors.Business("a new config file was created (%s)", "CONF:003")
 	ErrMissingTelegramToken = errors.System(nil, "missing telegram token", "CONF:004")
+	ErrMissingYoutubeToken  = errors.System(nil, "missing youtube token", "CONF:005")
 )
 
 func Load(file string) (AppConfig, error) {
@@ -73,9 +75,19 @@ func applyDefaults(cfg AppConfig) (AppConfig, error) {
 		cfg.TelegramToken = os.Getenv("TELEGRAM_TOKEN")
 	}
 
+	if cfg.YoutubeToken == "" {
+		cfg.YoutubeToken = os.Getenv("YOUTUBE_TOKEN")
+	}
+
 	if cfg.TelegramToken == "" {
 		return cfg, ErrMissingTelegramToken
 	}
+
+	if cfg.YoutubeToken == "" {
+		return cfg, ErrMissingYoutubeToken
+	}
+
+	fmt.Println(cfg)
 
 	return cfg, nil
 }

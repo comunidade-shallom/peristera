@@ -1,6 +1,8 @@
 package worker
 
 import (
+	"fmt"
+
 	"github.com/comunidade-shallom/peristera/pkg/config"
 	"github.com/comunidade-shallom/peristera/pkg/support"
 	"github.com/comunidade-shallom/peristera/pkg/telegram"
@@ -17,7 +19,10 @@ var Worker = &cli.Command{
 
 		pterm.Debug.Println("Creating bot instance")
 
-		bot, err := telegram.NewBot(cfg)
+		bot, err := telegram.NewBot(ctxCli.Context, *cfg)
+
+		pterm.Error.PrintOnErrorf("Starting error: %s", err)
+
 		if err != nil {
 			return err
 		}
@@ -33,8 +38,9 @@ var Worker = &cli.Command{
 
 		pterm.Info.Println("Starting bot...")
 
-		bot.OnError = func(err error, _ telebot.Context) {
-			pterm.Error.Println(err.Error())
+		bot.OnError = func(err error, tctx telebot.Context) {
+			tctx.Reply(fmt.Sprintf("Error: %s", err.Error()))
+			pterm.Error.Printfln("Bot error: %s", err.Error())
 		}
 
 		bot.Start()
