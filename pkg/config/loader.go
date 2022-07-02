@@ -2,7 +2,6 @@ package config
 
 import (
 	goErrors "errors"
-	"fmt"
 	"os"
 	"path"
 	"path/filepath"
@@ -71,23 +70,21 @@ func Load(file string) (AppConfig, error) {
 }
 
 func applyDefaults(cfg AppConfig) (AppConfig, error) {
-	if cfg.TelegramToken == "" {
-		cfg.TelegramToken = os.Getenv("TELEGRAM_TOKEN")
+	if cfg.Telegram.Token == "" {
+		cfg.Telegram.Token = os.Getenv("TELEGRAM_TOKEN")
 	}
 
-	if cfg.YoutubeToken == "" {
-		cfg.YoutubeToken = os.Getenv("YOUTUBE_TOKEN")
+	if cfg.Youtube.Token == "" {
+		cfg.Youtube.Token = os.Getenv("YOUTUBE_TOKEN")
 	}
 
-	if cfg.TelegramToken == "" {
+	if cfg.Telegram.Token == "" {
 		return cfg, ErrMissingTelegramToken
 	}
 
-	if cfg.YoutubeToken == "" {
+	if cfg.Youtube.Token == "" {
 		return cfg, ErrMissingYoutubeToken
 	}
-
-	fmt.Println(cfg)
 
 	return cfg, nil
 }

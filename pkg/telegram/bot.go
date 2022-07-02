@@ -13,7 +13,7 @@ const poolingTiming = 10 * time.Second
 
 func NewBot(ctx context.Context, cfg config.AppConfig) (*tele.Bot, error) {
 	pref := tele.Settings{
-		Token:  cfg.TelegramToken,
+		Token:  cfg.Telegram.Token,
 		Poller: &tele.LongPoller{Timeout: poolingTiming},
 	}
 
@@ -22,7 +22,7 @@ func NewBot(ctx context.Context, cfg config.AppConfig) (*tele.Bot, error) {
 		return bot, err
 	}
 
-	youtube, err := ytube.NewService(ctx, cfg)
+	youtube, err := ytube.NewService(ctx, cfg.Youtube)
 	if err != nil {
 		return bot, err
 	}

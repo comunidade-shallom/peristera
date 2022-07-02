@@ -9,8 +9,12 @@ import (
 	"google.golang.org/api/youtube/v3"
 )
 
-func NewService(ctx context.Context, cfg config.AppConfig) (Service, error) {
-	yService, err := youtube.NewService(ctx, option.WithAPIKey(cfg.YoutubeToken))
+type Service struct {
+	youtube *youtube.Service
+}
+
+func NewService(ctx context.Context, cfg config.YouTube) (Service, error) {
+	yService, err := youtube.NewService(ctx, option.WithAPIKey(cfg.Token))
 	if err != nil {
 		return Service{}, err
 	}
@@ -18,10 +22,6 @@ func NewService(ctx context.Context, cfg config.AppConfig) (Service, error) {
 	return Service{
 		youtube: yService,
 	}, nil
-}
-
-type Service struct {
-	youtube *youtube.Service
 }
 
 func (s Service) LastVideos(ctx context.Context, channelID string, maxResults int) ([]Video, error) {

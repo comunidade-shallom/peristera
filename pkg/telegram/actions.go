@@ -38,7 +38,7 @@ func (h Handler) Videos(ctx telebot.Context) error {
 
 	defer cancel()
 
-	for _, ch := range h.cfg.Channels {
+	for _, ch := range h.cfg.Youtube.Channels {
 		if err := ctx.Notify(telebot.Typing); err != nil {
 			return err
 		}

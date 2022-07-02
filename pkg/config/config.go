@@ -6,15 +6,9 @@ import (
 
 type ctxKey struct{}
 
-type Channel struct {
-	Name string `fig:"name" yaml:"name"`
-	ID   string `fig:"id" yaml:"id"`
-}
-
 type AppConfig struct {
-	TelegramToken string    `fig:"telegram_token" yaml:"telegram_token"`
-	YoutubeToken  string    `fig:"youtube_token" yaml:"youtube_token"`
-	Channels      []Channel `fig:"channels" yaml:"channels"`
+	Telegram Telegram `fig:"token" yaml:"token"`
+	Youtube  YouTube  `fig:"youtube" yaml:"youtube"`
 }
 
 func Ctx(ctx context.Context) *AppConfig {
