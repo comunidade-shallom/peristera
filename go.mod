@@ -7,6 +7,7 @@ require (
 	github.com/kkyr/fig v0.3.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/pterm/pterm v0.12.42
+	github.com/rs/zerolog v1.27.0
 	github.com/urfave/cli/v2 v2.10.3
 	google.golang.org/api v0.86.0
 	gopkg.in/telebot.v3 v3.0.0
@@ -26,6 +27,8 @@ require (
 	github.com/googleapis/gax-go/v2 v2.4.0 // indirect
 	github.com/gookit/color v1.5.0 // indirect
 	github.com/lithammer/fuzzysearch v1.1.5 // indirect
+	github.com/mattn/go-colorable v0.1.12 // indirect
+	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/mattn/go-runewidth v0.0.13 // indirect
 	github.com/mitchellh/mapstructure v1.4.1 // indirect
 	github.com/pelletier/go-toml v1.9.3 // indirect

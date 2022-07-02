@@ -7,6 +7,8 @@ import (
 type ctxKey struct{}
 
 type AppConfig struct {
+	Debug    bool     `fig:"-" yaml:"-"`
+	Logger   Logger   `fig:"logger" yaml:"logger"`
 	Telegram Telegram `fig:"token" yaml:"token"`
 	Youtube  YouTube  `fig:"youtube" yaml:"youtube"`
 }
@@ -25,4 +27,8 @@ func (c *AppConfig) WithContext(ctx context.Context) context.Context {
 	}
 
 	return context.WithValue(ctx, ctxKey{}, c)
+}
+
+func (c AppConfig) Tags() map[string]interface{} {
+	return map[string]interface{}{}
 }

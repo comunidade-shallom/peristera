@@ -9,7 +9,7 @@ import (
 
 	"github.com/comunidade-shallom/peristera/pkg/config"
 	"github.com/comunidade-shallom/peristera/pkg/ytube"
-	"github.com/pterm/pterm"
+	"github.com/rs/zerolog"
 	"gopkg.in/telebot.v3"
 )
 
@@ -17,6 +17,7 @@ const timeout = 5
 const maxResults = 2
 
 type Handler struct {
+	logger  zerolog.Logger
 	cfg     config.AppConfig
 	youtube ytube.Service
 }
@@ -36,6 +37,8 @@ func (h Handler) Me(ctx telebot.Context) error {
 func (h Handler) Videos(ctx telebot.Context) error {
 	_ctx, cancel := context.WithTimeout(context.Background(), time.Second*timeout)
 
+	logger := ctx.Get(loggerKey).(zerolog.Logger)
+
 	defer cancel()
 
 	for _, ch := range h.cfg.Youtube.Channels {
@@ -43,7 +46,7 @@ func (h Handler) Videos(ctx telebot.Context) error {
 			return err
 		}
 
-		pterm.Info.Printfln("Loading last videos %s", ch.Name)
+		logger.Info().Msgf("Loading last videos %s", ch.Name)
 
 		vids, err := h.youtube.LastVideos(_ctx, ch.ID, maxResults)
 		if err != nil {
@@ -52,7 +55,7 @@ func (h Handler) Videos(ctx telebot.Context) error {
 
 		if len(vids) == 0 {
 			msg := fmt.Sprintf("%s: Sem resultados", ch.Name)
-			pterm.Warning.Println(msg)
+			logger.Warn().Msg(msg)
 
 			if err = ctx.Reply(msg); err != nil {
 				return err
@@ -65,7 +68,7 @@ func (h Handler) Videos(ctx telebot.Context) error {
 			ctx.Send(vid.URL())
 		}
 
-		pterm.Success.Printfln("%v Videos from %s", len(vids), ch.Name)
+		logger.Info().Msgf("%v Videos from %s", len(vids), ch.Name)
 	}
 
 	return nil
