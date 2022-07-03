@@ -11,6 +11,7 @@ type AppConfig struct {
 	Logger      Logger   `fig:"logger" yaml:"logger"`
 	Telegram    Telegram `fig:"token" yaml:"token"`
 	Youtube     YouTube  `fig:"youtube" yaml:"youtube"`
+	Pix         Pix      `fig:"pix" yaml:"pix"`
 	Description string   `fig:"description" yaml:"description"`
 }
 

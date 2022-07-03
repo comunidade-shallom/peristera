@@ -62,6 +62,8 @@ func NewBot(ctx context.Context, cfg config.AppConfig) (*tele.Bot, error) {
 
 	bot.Handle("/start", handlers.Start)
 	bot.Handle("/me", handlers.Me)
+	bot.Handle("/pix", handlers.Pix)
+	bot.Handle("/oferta", handlers.Pix)
 	bot.Handle("/videos", handlers.Videos)
 
 	return bot, nil
