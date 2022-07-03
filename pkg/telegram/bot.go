@@ -39,6 +39,7 @@ func NewBot(ctx context.Context, cfg config.AppConfig) (*tele.Bot, error) {
 	logger := zerolog.Ctx(ctx).With().Str("context", "bot").Logger()
 
 	handlers := Handler{
+		bot:     bot,
 		logger:  logger,
 		cfg:     cfg,
 		youtube: youtube,
