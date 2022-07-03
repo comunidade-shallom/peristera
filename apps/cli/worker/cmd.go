@@ -17,6 +17,13 @@ import (
 var Worker = &cli.Command{
 	Name:  "worker",
 	Usage: "Start telegram bot worker",
+	Flags: []cli.Flag{
+		&cli.BoolFlag{
+			Name:        "cron",
+			Usage:       "enable cron service",
+			DefaultText: "false",
+		},
+	},
 	Action: func(c *cli.Context) error {
 		cfg := config.Ctx(c.Context)
 		logger := zerolog.Ctx(c.Context).
@@ -61,6 +68,14 @@ var Worker = &cli.Command{
 		}
 
 		go func() {
+			if c.Bool("cron") == false {
+				logger.Debug().Msg("cron disabled")
+
+				return
+			} else {
+				logger.Info().Msg("cron enabled")
+			}
+
 			jobs, err := cron.New(ctx, *cfg, bot, youtube)
 			if err != nil {
 				logger.Warn().Err(err).Msg("Fail to create cron jobs")
