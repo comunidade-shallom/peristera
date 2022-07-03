@@ -8,11 +8,13 @@ type ctxKey struct{}
 
 type AppConfig struct {
 	Debug       bool     `fig:"-" yaml:"-"`
+	Timezone    string   `fig:"timezone" yaml:"timezone"`
+	Description string   `fig:"description" yaml:"description"`
 	Logger      Logger   `fig:"logger" yaml:"logger"`
-	Telegram    Telegram `fig:"token" yaml:"token"`
+	Telegram    Telegram `fig:"telegram" yaml:"telegram"`
 	Youtube     YouTube  `fig:"youtube" yaml:"youtube"`
 	Pix         Pix      `fig:"pix" yaml:"pix"`
-	Description string   `fig:"description" yaml:"description"`
+	Cron        Cron     `fig:"cron" yaml:"cron"`
 }
 
 func Ctx(ctx context.Context) *AppConfig {

@@ -1,11 +1,14 @@
 package worker
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/comunidade-shallom/peristera/pkg/config"
+	"github.com/comunidade-shallom/peristera/pkg/cron"
 	"github.com/comunidade-shallom/peristera/pkg/support"
 	"github.com/comunidade-shallom/peristera/pkg/telegram"
+	"github.com/comunidade-shallom/peristera/pkg/ytube"
 	"github.com/rs/zerolog"
 	"github.com/urfave/cli/v2"
 	"gopkg.in/telebot.v3"
@@ -21,9 +24,9 @@ var Worker = &cli.Command{
 			Str("context", "worker").
 			Logger()
 
-		logger.Debug().Msg("Creating bot instance")
+		logger.Debug().Msg("Creating youtube service instance")
 
-		bot, err := telegram.NewBot(c.Context, *cfg)
+		youtube, err := ytube.NewService(c.Context, cfg.Youtube)
 
 		if err != nil {
 			logger.Error().Err(err).Msg("Starting error")
@@ -31,7 +34,16 @@ var Worker = &cli.Command{
 			return err
 		}
 
-		ctx, _ := support.WithKillSignal(c.Context)
+		logger.Debug().Msg("Creating bot instance")
+		bot, err := telegram.NewBot(c.Context, *cfg, youtube)
+
+		if err != nil {
+			logger.Error().Err(err).Msg("Starting error")
+
+			return err
+		}
+
+		ctx, cancel := support.WithKillSignal(c.Context)
 
 		go func() {
 			<-ctx.Done()
@@ -47,6 +59,23 @@ var Worker = &cli.Command{
 
 			logger.Error().Err(err).Msg("Bot error")
 		}
+
+		go func() {
+			jobs, err := cron.New(ctx, *cfg, bot, youtube)
+			if err != nil {
+				logger.Warn().Err(err).Msg("Fail to create cron jobs")
+				cancel()
+			}
+
+			switch jobs.Start(ctx) {
+			case context.Canceled:
+			case nil:
+				return
+			default:
+				logger.Warn().Err(err).Msg("Fail start jobs")
+				cancel()
+			}
+		}()
 
 		bot.Start()
 

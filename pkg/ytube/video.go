@@ -51,3 +51,7 @@ func FromSearchResult(raw *youtube.SearchResult) (Video, error) {
 func (v Video) URL() string {
 	return "https://youtu.be/" + v.VideoID.VideoID
 }
+
+func (v Video) ToBotContent() (interface{}, error) {
+	return v.URL(), nil
+}

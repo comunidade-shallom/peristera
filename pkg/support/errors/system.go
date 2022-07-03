@@ -24,6 +24,11 @@ func (e SystemError) Error() string {
 	var builder strings.Builder
 
 	builder.WriteString(e.BusinessError.Error())
+
+	if e.Reason == nil {
+		return builder.String()
+	}
+
 	builder.WriteString(" (")
 	builder.WriteString(e.Reason.Error())
 	builder.WriteString(")")

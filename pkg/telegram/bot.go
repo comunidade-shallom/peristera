@@ -16,18 +16,13 @@ const poolingTiming = 10 * time.Second
 
 const loggerKey = "logger"
 
-func NewBot(ctx context.Context, cfg config.AppConfig) (*tele.Bot, error) {
+func NewBot(ctx context.Context, cfg config.AppConfig, youtube ytube.Service) (*tele.Bot, error) {
 	pref := tele.Settings{
 		Token:  cfg.Telegram.Token,
 		Poller: &tele.LongPoller{Timeout: poolingTiming},
 	}
 
 	bot, err := tele.NewBot(pref)
-	if err != nil {
-		return bot, err
-	}
-
-	youtube, err := ytube.NewService(ctx, cfg.Youtube)
 	if err != nil {
 		return bot, err
 	}
