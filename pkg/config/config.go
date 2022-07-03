@@ -7,10 +7,11 @@ import (
 type ctxKey struct{}
 
 type AppConfig struct {
-	Debug    bool     `fig:"-" yaml:"-"`
-	Logger   Logger   `fig:"logger" yaml:"logger"`
-	Telegram Telegram `fig:"token" yaml:"token"`
-	Youtube  YouTube  `fig:"youtube" yaml:"youtube"`
+	Debug       bool     `fig:"-" yaml:"-"`
+	Logger      Logger   `fig:"logger" yaml:"logger"`
+	Telegram    Telegram `fig:"token" yaml:"token"`
+	Youtube     YouTube  `fig:"youtube" yaml:"youtube"`
+	Description string   `fig:"description" yaml:"description"`
 }
 
 func Ctx(ctx context.Context) *AppConfig {
