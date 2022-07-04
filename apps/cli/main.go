@@ -30,6 +30,11 @@ func main() {
 				Usage:       "Load configuration from",
 				DefaultText: fmt.Sprintf("%s/peristera.yml", support.GetBinDirPath()),
 			},
+			&cli.BoolFlag{
+				Name:        "no-banner",
+				Usage:       "hide initial banner",
+				DefaultText: "false",
+			},
 			&cli.StringFlag{
 				Name:        "level",
 				Aliases:     []string{"l"},
@@ -59,9 +64,11 @@ func main() {
 func beforeRun(ctx *cli.Context) error {
 	pterm.Debug.Debugger = !ctx.Bool("debug")
 
-	pterm.DefaultHeader.
-		WithMargin(5). //nolint:gomnd
-		Println("Peristera CLI \n" + config.Version())
+	if !ctx.Bool("no-banner") {
+		pterm.DefaultHeader.
+			WithMargin(5). //nolint:gomnd
+			Println("Peristera CLI \n" + config.Version())
+	}
 
 	appConfig, err := config.Load(ctx.String("config"))
 
