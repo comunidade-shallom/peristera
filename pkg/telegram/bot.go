@@ -8,7 +8,7 @@ import (
 	"github.com/comunidade-shallom/peristera/pkg/config"
 	"github.com/comunidade-shallom/peristera/pkg/ytube"
 	"github.com/rs/zerolog"
-	tele "gopkg.in/telebot.v3"
+	"gopkg.in/telebot.v3"
 	"gopkg.in/telebot.v3/middleware"
 )
 
@@ -16,13 +16,13 @@ const poolingTiming = 10 * time.Second
 
 const loggerKey = "logger"
 
-func NewBot(ctx context.Context, cfg config.AppConfig, youtube ytube.Service) (*tele.Bot, error) {
-	pref := tele.Settings{
+func NewBot(ctx context.Context, cfg config.AppConfig, youtube ytube.Service) (*telebot.Bot, error) {
+	pref := telebot.Settings{
 		Token:  cfg.Telegram.Token,
-		Poller: &tele.LongPoller{Timeout: poolingTiming},
+		Poller: &telebot.LongPoller{Timeout: poolingTiming},
 	}
 
-	bot, err := tele.NewBot(pref)
+	bot, err := telebot.NewBot(pref)
 	if err != nil {
 		return bot, err
 	}
@@ -40,8 +40,8 @@ func NewBot(ctx context.Context, cfg config.AppConfig, youtube ytube.Service) (*
 		youtube: youtube,
 	}
 
-	bot.Use(func(next tele.HandlerFunc) tele.HandlerFunc {
-		return func(tx tele.Context) error {
+	bot.Use(func(next telebot.HandlerFunc) telebot.HandlerFunc {
+		return func(tx telebot.Context) error {
 			tx.Set(
 				loggerKey,
 				logger.With().
@@ -61,5 +61,16 @@ func NewBot(ctx context.Context, cfg config.AppConfig, youtube ytube.Service) (*
 	bot.Handle("/oferta", handlers.Pix)
 	bot.Handle("/videos", handlers.Videos)
 
-	return bot, nil
+	err = bot.SetCommands([]telebot.Command{
+		{
+			Text:        "oferta",
+			Description: "Informações para ofertar online",
+		},
+		{
+			Text:        "videos",
+			Description: "Últimos vídeos do nosso youtube",
+		},
+	})
+
+	return bot, err
 }
