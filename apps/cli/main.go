@@ -60,7 +60,7 @@ func beforeRun(ctx *cli.Context) error {
 
 	pterm.DefaultHeader.
 		WithMargin(5). //nolint:gomnd
-		Println("Peristera CLI")
+		Println("Peristera CLI \n" + config.Version())
 
 	appConfig, err := config.Load(ctx.String("config"))
 

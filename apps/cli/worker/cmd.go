@@ -53,27 +53,27 @@ var Worker = &cli.Command{
 
 		go func() {
 			<-ctx.Done()
-			logger.Warn().Msg("Stoping bot...")
+			logger.Warn().Err(ctx.Err()).Msg("Stoping bot...")
 			bot.Stop()
 			logger.Warn().Msg("Stoped...")
 		}()
 
 		logger.Info().Msg("Starting bot...")
 
-		bot.OnError = func(err error, tctx telebot.Context) {
-			_ = tctx.Reply(fmt.Sprintf("Error: %s", err.Error()))
+		bot.OnError = func(err error, tx telebot.Context) {
+			_ = tx.Reply(fmt.Sprintf("Error: %s", err.Error()))
 
 			logger.Error().Err(err).Msg("Bot error")
 		}
 
 		go func() {
 			if !cmd.Bool("cron") {
-				logger.Debug().Msg("cron disabled")
+				logger.Warn().Msg("Cron is disabled")
 
 				return
 			}
 
-			logger.Info().Msg("cron enabled")
+			logger.Info().Msg("Cron is enabled")
 
 			jobs, err := cron.New(ctx, *cfg, bot, youtube)
 			if err != nil {
