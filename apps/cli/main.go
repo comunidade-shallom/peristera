@@ -66,7 +66,7 @@ func beforeRun(ctx *cli.Context) error {
 
 	logLevel := ctx.String("level")
 
-	if logLevel == "debug" || appConfig.Logger.Level == "debug" {
+	if appConfig.Logger.Debug(logLevel) {
 		appConfig.Debug = true
 	}
 
