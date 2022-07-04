@@ -6,6 +6,7 @@ linters:
     - exhaustruct
     - gochecknoglobals
     - forbidigo
+    - gochecknoinits
 
   presets:
     - bugs
@@ -22,7 +23,9 @@ linters:
     - test
     - unused
 
-# linters-settings:
+linters-settings:
+  varnamelen:
+    min-name-length: 2
 #   exhaustruct:
 #     exclude:
 #       - 'cli\.*Flag'

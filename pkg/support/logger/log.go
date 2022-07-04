@@ -56,8 +56,8 @@ func getLogLevel(val string) zerolog.Level {
 	}
 }
 
-func buildBaseLogger(l zerolog.Logger, format string) zerolog.Logger {
-	l = l.With().Str("app", "peristera").Logger()
+func buildBaseLogger(logger zerolog.Logger, format string) zerolog.Logger {
+	logger = logger.With().Str("app", "peristera").Logger()
 
 	if format == "" {
 		format = strings.ToLower(support.GetEnv("LOG_FORMAT", "json"))
@@ -65,8 +65,8 @@ func buildBaseLogger(l zerolog.Logger, format string) zerolog.Logger {
 
 	switch format {
 	case "json":
-		return l
+		return logger
 	default:
-		return l.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+		return logger.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	}
 }

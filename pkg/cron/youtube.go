@@ -14,7 +14,10 @@ func (j Jobs) LastVideos(ctx context.Context) error {
 	logger.Info().Msg("Running...")
 
 	for _, channel := range j.cfg.Youtube.Channels {
-		j.lastChannelVideos(ctx, channel)
+		err := j.lastChannelVideos(ctx, channel)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

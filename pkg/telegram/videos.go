@@ -10,38 +10,20 @@ import (
 	"gopkg.in/telebot.v3"
 )
 
-const loadTimeout = 5
-const defaultCountResults = 2
-const maxResults = 5
+const (
+	loadTimeout         = 5
+	defaultCountResults = 2
+	maxResults          = 5
+)
 
-func (h Handler) Videos(tx telebot.Context) error { //nolint:funlen
+func (h Handler) Videos(tx telebot.Context) error {
 	_ctx, cancel := context.WithTimeout(context.Background(), time.Second*loadTimeout)
 
 	logger := tx.Get(loggerKey).(zerolog.Logger) //nolint:forcetypeassert
 
 	defer cancel()
 
-	args := tx.Args()
-
-	var count int
-
-	var err error
-
-	if len(args) > 0 {
-		count, err = strconv.Atoi(args[0])
-
-		if err != nil {
-			_ = tx.Reply(fmt.Sprintf("%s não é um número válido", args[0]))
-			count = defaultCountResults
-		}
-
-		if count > maxResults {
-			_ = tx.Reply(fmt.Sprintf("O número máximo de resultados é %v", maxResults))
-			count = maxResults
-		}
-	} else {
-		count = defaultCountResults
-	}
+	count := getMaxArg(tx.Args(), logger, tx)
 
 	for _, ch := range h.cfg.Youtube.Channels {
 		if err := tx.Notify(telebot.Typing); err != nil {
@@ -86,4 +68,33 @@ func (h Handler) Videos(tx telebot.Context) error { //nolint:funlen
 	}
 
 	return nil
+}
+
+func getMaxArg(args []string, logger zerolog.Logger, tx telebot.Context) int {
+	var count int
+
+	var err error
+
+	if len(args) > 0 {
+		count, err = strconv.Atoi(args[0])
+
+		if err != nil {
+			msg := fmt.Sprintf("%s não é um número válido", args[0])
+			logger.Warn().Msg(msg)
+			_ = tx.Reply(msg)
+			count = defaultCountResults
+		}
+
+		if count > maxResults {
+			msg := fmt.Sprintf("O número máximo de resultados é %v", maxResults)
+			logger.Warn().Msg(msg)
+
+			_ = tx.Reply(msg)
+			count = maxResults
+		}
+	} else {
+		count = defaultCountResults
+	}
+
+	return count
 }

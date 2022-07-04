@@ -41,17 +41,17 @@ func NewBot(ctx context.Context, cfg config.AppConfig, youtube ytube.Service) (*
 	}
 
 	bot.Use(func(next tele.HandlerFunc) tele.HandlerFunc {
-		return func(c tele.Context) error {
-			c.Set(
+		return func(tx tele.Context) error {
+			tx.Set(
 				loggerKey,
 				logger.With().
-					Str("message_id", strconv.Itoa(c.Message().ID)).
-					Str("sender_id", strconv.FormatInt(c.Sender().ID, 10)). //nolint:gomnd
-					Str("chat_id", strconv.FormatInt(c.Chat().ID, 10)).     //nolint:gomnd
+					Str("message_id", strconv.Itoa(tx.Message().ID)).
+					Str("sender_id", strconv.FormatInt(tx.Sender().ID, 10)). //nolint:gomnd
+					Str("chat_id", strconv.FormatInt(tx.Chat().ID, 10)).     //nolint:gomnd
 					Logger(),
 			)
 
-			return next(c)
+			return next(tx)
 		}
 	})
 

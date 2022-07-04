@@ -24,17 +24,16 @@ var Worker = &cli.Command{
 			DefaultText: "false",
 		},
 	},
-	Action: func(c *cli.Context) error {
-		cfg := config.Ctx(c.Context)
-		logger := zerolog.Ctx(c.Context).
+	Action: func(cmd *cli.Context) error {
+		cfg := config.Ctx(cmd.Context)
+		logger := zerolog.Ctx(cmd.Context).
 			With().
 			Str("context", "worker").
 			Logger()
 
 		logger.Debug().Msg("Creating youtube service instance")
 
-		youtube, err := ytube.NewService(c.Context, cfg.Youtube)
-
+		youtube, err := ytube.NewService(cmd.Context, cfg.Youtube)
 		if err != nil {
 			logger.Error().Err(err).Msg("Starting error")
 
@@ -42,15 +41,15 @@ var Worker = &cli.Command{
 		}
 
 		logger.Debug().Msg("Creating bot instance")
-		bot, err := telegram.NewBot(c.Context, *cfg, youtube)
 
+		bot, err := telegram.NewBot(cmd.Context, *cfg, youtube)
 		if err != nil {
 			logger.Error().Err(err).Msg("Starting error")
 
 			return err
 		}
 
-		ctx, cancel := support.WithKillSignal(c.Context)
+		ctx, cancel := support.WithKillSignal(cmd.Context)
 
 		go func() {
 			<-ctx.Done()
@@ -68,13 +67,13 @@ var Worker = &cli.Command{
 		}
 
 		go func() {
-			if c.Bool("cron") == false {
+			if !cmd.Bool("cron") {
 				logger.Debug().Msg("cron disabled")
 
 				return
-			} else {
-				logger.Info().Msg("cron enabled")
 			}
+
+			logger.Info().Msg("cron enabled")
 
 			jobs, err := cron.New(ctx, *cfg, bot, youtube)
 			if err != nil {
@@ -82,7 +81,9 @@ var Worker = &cli.Command{
 				cancel()
 			}
 
-			switch jobs.Start(ctx) {
+			err = jobs.Start(ctx)
+
+			switch err { //nolint:errorlint
 			case context.Canceled:
 			case nil:
 				return

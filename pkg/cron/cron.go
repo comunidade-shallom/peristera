@@ -29,7 +29,7 @@ var ErrNoChatToBroadcast = errors.Business("No chats to broadcast", "CRON:001")
 
 func (j Jobs) Start(ctx context.Context) error {
 	gocron.SetPanicHandler(func(jobName string, recoverData interface{}) {
-		err := recoverData.(error)
+		err, _ := recoverData.(error)
 
 		zerolog.Ctx(ctx).
 			Error().
@@ -105,14 +105,14 @@ func (j *Jobs) register(ctx context.Context) error {
 	return nil
 }
 
-func (j Jobs) sendMessages(chatId int64, entries []interface{}, opts ...interface{}) error {
+func (j Jobs) sendMessages(chatID int64, entries []interface{}, opts ...interface{}) error {
 	var err error
 
 	for _, entry := range entries {
 		content, _ := toBotContent(entry)
 
 		_, err = j.bot.Send(&telebot.Chat{
-			ID: chatId,
+			ID: chatID,
 		}, content, opts...)
 
 		if err != nil {
@@ -142,8 +142,8 @@ func (j Jobs) broadcast(fn MessageBuilder, opts ...interface{}) error {
 		return err
 	}
 
-	for _, chatId := range j.cfg.Telegram.Broadcast {
-		err = j.sendMessages(chatId, entries, opts...)
+	for _, chatID := range j.cfg.Telegram.Broadcast {
+		err = j.sendMessages(chatID, entries, opts...)
 
 		if err != nil {
 			return err

@@ -10,5 +10,5 @@ func init() { //nolint:gochecknoinits
 }
 
 func RandBool() bool {
-	return rand.Intn(2) == 1 //nolint:gomnd
+	return rand.Intn(2) == 1 //nolint:gomnd,gosec
 }
