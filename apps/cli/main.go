@@ -5,6 +5,7 @@ import (
 	"os"
 	"sort"
 
+	"github.com/comunidade-shallom/peristera/apps/cli/system"
 	"github.com/comunidade-shallom/peristera/apps/cli/worker"
 	"github.com/comunidade-shallom/peristera/pkg/config"
 	"github.com/comunidade-shallom/peristera/pkg/support"
@@ -36,7 +37,7 @@ func main() {
 				DefaultText: "info",
 			},
 		},
-		Commands: []*cli.Command{worker.Worker},
+		Commands: []*cli.Command{worker.Worker, system.System},
 		Before:   beforeRun,
 	}
 
