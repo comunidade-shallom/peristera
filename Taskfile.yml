@@ -49,12 +49,23 @@ tasks:
     cmds:
       - go run ./apps/cli/ {{.CLI_ARGS}}
 
-  check:
+  format:
     desc: Check source code
     cmds:
       - go fmt ./...
+
+  vet:
+    desc: Check source code
+    cmds:
       - go vet ./...
-      - golangci-lint run ./...
+
+  check:
+    desc: Check source code
+    deps:
+      - format
+      - vet
+    cmds:
+      - golangci-lint run ./... {{.CLI_ARGS}}
 
   clean:
     desc: Remove old binaries

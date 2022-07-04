@@ -1,0 +1,6 @@
+{
+  "recommendations": [
+    "golang.Go",
+    "eamodio.gitlens"
+  ]
+}
