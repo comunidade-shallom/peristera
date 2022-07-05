@@ -59,16 +59,21 @@ func NewBot(ctx context.Context, cfg config.AppConfig, youtube ytube.Service) (*
 	bot.Handle("/me", handlers.Me)
 	bot.Handle("/pix", handlers.Pix)
 	bot.Handle("/oferta", handlers.Pix)
+	bot.Handle("/sobre", handlers.Start)
 	bot.Handle("/videos", handlers.Videos)
 
 	err = bot.SetCommands([]telebot.Command{
+		{
+			Text:        "sobre",
+			Description: "Informações sobre a Shallom em Meriti",
+		},
 		{
 			Text:        "oferta",
 			Description: "Informações para ofertar online",
 		},
 		{
 			Text:        "videos",
-			Description: "Últimos vídeos do nosso youtube",
+			Description: "Últimos vídeos do nosso YouTube",
 		},
 	})
 
