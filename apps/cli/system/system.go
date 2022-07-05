@@ -82,7 +82,8 @@ func renderInfo() error {
 		return err
 	}
 
-	err = pterm.DefaultTable.
+	infos, err := pterm.DefaultTable.
+		WithBoxed().
 		WithData(pterm.TableData{
 			{"Hostname", info.Hostname},
 			{"Platform", info.Platform},
@@ -90,9 +91,8 @@ func renderInfo() error {
 			{"GoOS", info.GoOS},
 			{"Core", info.Core},
 			{"OS", info.OS},
-			{"kernal", info.Kernel},
-		}).Render()
-
+			{"Kernel", info.Kernel},
+		}).Srender()
 	if err != nil {
 		return err
 	}
@@ -110,10 +110,30 @@ func renderInfo() error {
 		lines = append(lines, []string{v.Network(), v.String()})
 	}
 
-	return pterm.DefaultTable.
+	ips, err := pterm.DefaultTable.
+		WithBoxed().
 		WithHasHeader().
-		WithData(lines).
-		Render()
+		WithData(lines).Srender()
+	if err != nil {
+		return err
+	}
+
+	panels, err := pterm.DefaultPanel.WithPanels(pterm.Panels{
+		{{Data: infos}},
+		{{Data: ips}},
+	}).Srender()
+	if err != nil {
+		return err
+	}
+
+	pterm.DefaultBox.
+		WithTitle("System Info").
+		WithTitleBottomRight().
+		WithRightPadding(0).
+		WithBottomPadding(0).
+		Println(panels)
+
+	return nil
 }
 
 func getMessage(head string) (string, error) {
