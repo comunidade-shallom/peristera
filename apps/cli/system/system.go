@@ -20,7 +20,7 @@ import (
 
 var NoAdminsDefined = errors.Business("No admins defined", "SY:001")
 
-var specials = []rune{'.', '\'', '(', ')', '-'}
+var specials = []rune{'.', '\'', '(', ')', '-', '+'}
 
 var System = &cli.Command{
 	Name:  "system",
