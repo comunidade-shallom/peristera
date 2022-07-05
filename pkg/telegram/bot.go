@@ -2,7 +2,6 @@ package telegram
 
 import (
 	"context"
-	"strconv"
 	"time"
 
 	"github.com/comunidade-shallom/peristera/pkg/config"
@@ -13,8 +12,6 @@ import (
 )
 
 const poolingTiming = 10 * time.Second
-
-const loggerKey = "logger"
 
 func NewBot(ctx context.Context, cfg config.AppConfig, youtube ytube.Service) (*telebot.Bot, error) {
 	pref := telebot.Settings{
@@ -40,27 +37,18 @@ func NewBot(ctx context.Context, cfg config.AppConfig, youtube ytube.Service) (*
 		youtube: youtube,
 	}
 
-	bot.Use(func(next telebot.HandlerFunc) telebot.HandlerFunc {
-		return func(tx telebot.Context) error {
-			tx.Set(
-				loggerKey,
-				logger.With().
-					Str("message_id", strconv.Itoa(tx.Message().ID)).
-					Str("sender_id", strconv.FormatInt(tx.Sender().ID, 10)). //nolint:gomnd
-					Str("chat_id", strconv.FormatInt(tx.Chat().ID, 10)).     //nolint:gomnd
-					Logger(),
-			)
-
-			return next(tx)
-		}
-	})
+	bot.Use(useLogger(logger))
 
 	bot.Handle("/start", handlers.Start)
-	bot.Handle("/me", handlers.Me)
 	bot.Handle("/pix", handlers.Pix)
 	bot.Handle("/oferta", handlers.Pix)
 	bot.Handle("/sobre", handlers.Start)
 	bot.Handle("/videos", handlers.Videos)
+
+	adm := bot.Group()
+	adm.Use(onlyAdmins(cfg.Telegram))
+
+	adm.Handle("/me", handlers.Me)
 
 	err = bot.SetCommands([]telebot.Command{
 		{
