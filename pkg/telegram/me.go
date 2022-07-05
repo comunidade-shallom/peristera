@@ -4,22 +4,12 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/comunidade-shallom/peristera/pkg/config"
-	"github.com/comunidade-shallom/peristera/pkg/ytube"
-	"github.com/rs/zerolog"
 	"gopkg.in/telebot.v3"
 )
 
-type Handler struct {
-	logger  zerolog.Logger
-	cfg     config.AppConfig
-	youtube ytube.Service
-	bot     *telebot.Bot
-}
-
-func (h Handler) Me(ctx telebot.Context) error {
-	sender := ctx.Sender()
-	chat := ctx.Chat()
+func (h Handler) Me(tx telebot.Context) error {
+	sender := tx.Sender()
+	chat := tx.Chat()
 
 	var builder strings.Builder
 
@@ -29,5 +19,5 @@ func (h Handler) Me(ctx telebot.Context) error {
 	builder.WriteString("\n\\-\\-\n")
 	builder.WriteString("\n*Chat ID: * `" + strconv.Itoa(int(chat.ID)) + "`")
 
-	return ctx.Send(builder.String(), telebot.ModeMarkdownV2)
+	return tx.Send(builder.String(), telebot.ModeMarkdownV2)
 }

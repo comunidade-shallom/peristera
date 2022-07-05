@@ -19,7 +19,7 @@ const (
 func (h Handler) Videos(tx telebot.Context) error {
 	_ctx, cancel := context.WithTimeout(context.Background(), time.Second*loadTimeout)
 
-	logger := tx.Get(loggerKey).(zerolog.Logger) //nolint:forcetypeassert
+	logger := h.logger(tx)
 
 	defer cancel()
 

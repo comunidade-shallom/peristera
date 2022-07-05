@@ -32,7 +32,6 @@ func NewBot(ctx context.Context, cfg config.AppConfig, youtube ytube.Service) (*
 
 	handlers := Handler{
 		bot:     bot,
-		logger:  logger,
 		cfg:     cfg,
 		youtube: youtube,
 	}
