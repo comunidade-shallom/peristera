@@ -54,6 +54,7 @@ func Load(file string) (AppConfig, error) {
 			path.Join(home, ".config/peristera"),
 			home,
 			"/etc/peristera",
+			"/peristera.d",
 			support.GetBinDirPath(),
 		),
 	)
