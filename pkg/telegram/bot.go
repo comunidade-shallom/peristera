@@ -48,6 +48,7 @@ func NewBot(ctx context.Context, cfg config.AppConfig, youtube ytube.Service) (*
 	adm.Use(onlyAdmins(cfg.Telegram))
 
 	adm.Handle("/me", handlers.Me)
+	adm.Handle("/system", handlers.System)
 
 	err = bot.SetCommands([]telebot.Command{
 		{
