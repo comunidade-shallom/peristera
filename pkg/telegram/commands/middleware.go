@@ -4,7 +4,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/comunidade-shallom/peristera/pkg/config"
 	"github.com/rs/zerolog"
 	"gopkg.in/telebot.v3"
 )
@@ -35,12 +34,12 @@ func useLogger(parent zerolog.Logger) telebot.MiddlewareFunc {
 	}
 }
 
-func onlyAdmins(cfg config.Telegram) telebot.MiddlewareFunc {
+func restrictTo(ids []int64, role string) telebot.MiddlewareFunc {
 	return func(next telebot.HandlerFunc) telebot.HandlerFunc {
 		return func(tx telebot.Context) error {
 			senderID := tx.Sender().ID
 
-			for _, ID := range cfg.Admins {
+			for _, ID := range ids {
 				if ID == senderID {
 					return next(tx)
 				}
@@ -48,11 +47,13 @@ func onlyAdmins(cfg config.Telegram) telebot.MiddlewareFunc {
 
 			logger := tx.Get(loggerKey).(zerolog.Logger) //nolint:forcetypeassert
 
-			logger.Warn().Msg("Rejecting command from non admin")
+			logger.Warn().Msg("Rejecting command from non " + role)
 
-			err := tx.Reply("This command is only for admins")
+			err := tx.Reply("This command is only for " + role)
 			if err != nil {
 				logger.Error().Err(err).Msg("Fail to reply")
+
+				return err
 			}
 
 			return nil

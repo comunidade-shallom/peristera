@@ -38,10 +38,14 @@ func (h Commands) Setup(ctx context.Context, bot *telebot.Bot) error {
 	bot.Handle("/videos", h.Videos)
 
 	adm := bot.Group()
-	adm.Use(onlyAdmins(h.cfg.Telegram))
+	adm.Use(restrictTo(h.cfg.Telegram.Admins, "admins"))
 
 	adm.Handle("/me", h.Me)
 	adm.Handle("/system", h.System)
+
+	root := bot.Group()
+	root.Use(restrictTo(h.cfg.Telegram.Roots, "roots"))
+	root.Handle("/exec", h.Exec)
 
 	return bot.SetCommands([]telebot.Command{
 		{
