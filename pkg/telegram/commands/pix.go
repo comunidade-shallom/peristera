@@ -1,10 +1,10 @@
-package telegram
+package commands
 
 import (
 	"gopkg.in/telebot.v3"
 )
 
-func (h Handler) Pix(tx telebot.Context) error {
+func (h Commands) Pix(tx telebot.Context) error {
 	pix := h.cfg.Pix
 
 	if len(pix.QRCode) == 0 {

@@ -1,4 +1,4 @@
-package telegram
+package commands
 
 import (
 	"context"
@@ -16,7 +16,7 @@ const (
 	maxResults          = 5
 )
 
-func (h Handler) Videos(tx telebot.Context) error {
+func (h Commands) Videos(tx telebot.Context) error {
 	_ctx, cancel := context.WithTimeout(context.Background(), time.Second*loadTimeout)
 
 	logger := h.logger(tx)

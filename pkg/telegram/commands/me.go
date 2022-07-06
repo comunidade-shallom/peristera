@@ -1,4 +1,4 @@
-package telegram
+package commands
 
 import (
 	"strconv"
@@ -7,7 +7,7 @@ import (
 	"gopkg.in/telebot.v3"
 )
 
-func (h Handler) Me(tx telebot.Context) error {
+func (h Commands) Me(tx telebot.Context) error {
 	sender := tx.Sender()
 	chat := tx.Chat()
 

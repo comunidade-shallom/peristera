@@ -5,7 +5,6 @@ import (
 	"github.com/comunidade-shallom/peristera/pkg/support/errors"
 	"github.com/comunidade-shallom/peristera/pkg/support/system"
 	"github.com/comunidade-shallom/peristera/pkg/telegram"
-	"github.com/comunidade-shallom/peristera/pkg/ytube"
 	"github.com/rs/zerolog"
 	"github.com/urfave/cli/v2"
 	"gopkg.in/telebot.v3"
@@ -24,7 +23,7 @@ var System = &cli.Command{
 		},
 	},
 	Action: func(cmd *cli.Context) error {
-		cfg := config.Ctx(cmd.Context)
+		cfg := *config.Ctx(cmd.Context)
 
 		data, err := system.New()
 		if err != nil {
@@ -43,7 +42,7 @@ var System = &cli.Command{
 				return NoAdminsDefined
 			}
 
-			bot, err := telegram.NewBot(cmd.Context, *cfg, ytube.Service{})
+			bot, err := telegram.NewBot(cfg)
 			if err != nil {
 				return err
 			}

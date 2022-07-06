@@ -1,11 +1,11 @@
-package telegram
+package commands
 
 import (
 	"github.com/comunidade-shallom/peristera/pkg/support/system"
 	"gopkg.in/telebot.v3"
 )
 
-func (h Handler) System(tx telebot.Context) error {
+func (h Commands) System(tx telebot.Context) error {
 	logger := h.logger(tx)
 
 	logger.Info().Msg("Loading system info...")
