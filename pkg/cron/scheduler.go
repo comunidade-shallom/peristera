@@ -8,8 +8,8 @@ import (
 	"gopkg.in/telebot.v3"
 )
 
-func New(ctx context.Context, cfg config.AppConfig, bot *telebot.Bot, youtube ytube.Service) (Jobs, error) {
-	jb := Jobs{
+func New(ctx context.Context, cfg config.AppConfig, bot *telebot.Bot, youtube ytube.Service) (*Jobs, error) {
+	jb := &Jobs{
 		youtube: youtube,
 		cfg:     cfg,
 		bot:     bot,

@@ -52,6 +52,10 @@ func (v Video) URL() string {
 	return "https://youtu.be/" + v.VideoID.VideoID
 }
 
+func (v Video) Title() string {
+	return v.Snippet.Title
+}
+
 func (v Video) ToBotContent() (interface{}, error) {
 	return v.URL(), nil
 }

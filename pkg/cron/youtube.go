@@ -4,11 +4,12 @@ import (
 	"context"
 
 	"github.com/comunidade-shallom/peristera/pkg/config"
+	"github.com/comunidade-shallom/peristera/pkg/telegram/sender"
 )
 
 const videosMax = 2
 
-func (j Jobs) LastVideos(ctx context.Context) error {
+func (j *Jobs) LastVideos(ctx context.Context) error {
 	logger := j.jobLogger(ctx, "last-videos")
 
 	logger.Info().Msg("Running...")
@@ -23,8 +24,8 @@ func (j Jobs) LastVideos(ctx context.Context) error {
 	return nil
 }
 
-func (j Jobs) lastChannelVideos(ctx context.Context, channel config.Channel) error {
-	return j.broadcast(func() ([]interface{}, error) {
+func (j *Jobs) lastChannelVideos(ctx context.Context, channel config.Channel) error {
+	return j.broadcast(func(chats sender.Chats) ([]sender.Sendable, error) {
 		logger := j.jobLogger(ctx, "last-videos:"+channel.ID)
 
 		logger.Info().Msg("Loading last videos...")
@@ -37,14 +38,20 @@ func (j Jobs) lastChannelVideos(ctx context.Context, channel config.Channel) err
 		if err != nil {
 			logger.Error().Err(err).Msg("Fail to load last videos")
 
-			return make([]interface{}, 0), err
+			return make([]sender.Sendable, 0), err
 		}
 
-		res := make([]interface{}, length)
+		res := make([]sender.Sendable, length)
 
-		for i, vid := range vids {
-			logger.Info().Msgf("Video: %s", vid.Snippet.Title)
-			res[i] = vid
+		for index, vid := range vids {
+			logger.Info().Msgf("Video: %s", vid.Title())
+
+			msg, err := sender.FromVideo(vid, chats)
+			if err != nil {
+				return make([]sender.Sendable, 0), err
+			}
+
+			res[index] = msg
 		}
 
 		return res, nil

@@ -2,32 +2,31 @@ package cron
 
 import (
 	"context"
+	"sync"
 	"time"
 
 	"github.com/comunidade-shallom/peristera/pkg/config"
 	"github.com/comunidade-shallom/peristera/pkg/support/errors"
+	"github.com/comunidade-shallom/peristera/pkg/telegram/sender"
 	"github.com/comunidade-shallom/peristera/pkg/ytube"
 	"github.com/go-co-op/gocron"
 	"github.com/rs/zerolog"
 	"gopkg.in/telebot.v3"
 )
 
-type MessageBuilder func() ([]interface{}, error)
-
-type Sendable interface {
-	ToBotContent() (interface{}, error)
-}
+type MessageBuilder func(sender.Chats) ([]sender.Sendable, error)
 
 type Jobs struct {
 	cfg       config.AppConfig
-	bot       *telebot.Bot
 	youtube   ytube.Service
+	bot       *telebot.Bot
 	scheduler *gocron.Scheduler
+	senderCh  chan sender.Sendable
 }
 
 var ErrNoChatToBroadcast = errors.Business("No chats to broadcast", "CRON:001")
 
-func (j Jobs) Start(ctx context.Context) error {
+func (j *Jobs) Start(ctx context.Context) error {
 	gocron.SetPanicHandler(func(jobName string, recoverData interface{}) {
 		err, _ := recoverData.(error)
 
@@ -40,6 +39,17 @@ func (j Jobs) Start(ctx context.Context) error {
 			Msg("Panic to run job")
 	})
 
+	j.senderCh = make(chan sender.Sendable, 2) //nolint:gomnd
+
+	var wg sync.WaitGroup
+
+	wg.Add(1) // SendableWorker
+
+	go func() {
+		sender.SendableWorker(ctx, j.senderCh, j.bot)
+		wg.Done()
+	}()
+
 	j.scheduler.StartAsync()
 
 	<-ctx.Done()
@@ -49,21 +59,19 @@ func (j Jobs) Start(ctx context.Context) error {
 		Str("context", "jobs:manager").
 		Logger()
 
-	logger.Warn().Msg("Stopping cron jobs...")
+	logger.Warn().Err(ctx.Err()).Msg("Stopping cron jobs...")
 
 	j.scheduler.Stop()
 
+	close(j.senderCh)
+
 	logger.Warn().Msg("Cron jobs are stopped")
 
-	return ctx.Err()
-}
+	wg.Wait()
 
-func (j Jobs) jobLogger(ctx context.Context, job string) zerolog.Logger {
-	return zerolog.Ctx(ctx).
-		With().
-		Str("context", "jobs").
-		Str("job", job).
-		Logger()
+	logger.Warn().Msg("Waiting for workers...")
+
+	return nil
 }
 
 func (j *Jobs) register(ctx context.Context) error {
@@ -94,7 +102,9 @@ func (j *Jobs) register(ctx context.Context) error {
 	j.scheduler.SingletonModeAll()
 
 	for _, entry := range j.cfg.Cron.LastUpdates {
-		_, err := j.scheduler.Cron(entry).Do(lastUpdates)
+		_, err := j.scheduler.
+			Cron(entry).
+			Do(lastUpdates)
 		if err != nil {
 			return err
 		}
@@ -105,49 +115,26 @@ func (j *Jobs) register(ctx context.Context) error {
 	return nil
 }
 
-func (j Jobs) sendMessages(chatID int64, entries []interface{}, opts ...interface{}) error {
-	var err error
-
-	for _, entry := range entries {
-		content, _ := toBotContent(entry)
-
-		_, err = j.bot.Send(&telebot.Chat{
-			ID: chatID,
-		}, content, opts...)
-
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
+func (j *Jobs) jobLogger(ctx context.Context, job string) zerolog.Logger {
+	return zerolog.Ctx(ctx).
+		With().
+		Str("context", "jobs").
+		Str("job", job).
+		Logger()
 }
 
-func toBotContent(source interface{}) (interface{}, error) {
-	switch val := source.(type) {
-	case Sendable:
-		return val.ToBotContent()
-	default:
-		return source, nil
-	}
-}
-
-func (j Jobs) broadcast(fn MessageBuilder, opts ...interface{}) error {
+func (j *Jobs) broadcast(fn MessageBuilder, opts ...interface{}) error {
 	if len(j.cfg.Telegram.Broadcast) == 0 {
 		return ErrNoChatToBroadcast
 	}
 
-	entries, err := fn()
+	entries, err := fn(j.cfg.Telegram.Broadcast)
 	if err != nil {
 		return err
 	}
 
-	for _, chatID := range j.cfg.Telegram.Broadcast {
-		err = j.sendMessages(chatID, entries, opts...)
-
-		if err != nil {
-			return err
-		}
+	for _, msg := range entries {
+		j.senderCh <- msg
 	}
 
 	return nil
