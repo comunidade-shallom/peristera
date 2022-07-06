@@ -3,11 +3,13 @@ module github.com/comunidade-shallom/peristera
 go 1.18
 
 require (
+	code.cloudfoundry.org/bytefmt v0.0.0-20211005130812-5bb3c17173e5
 	github.com/creasty/defaults v1.6.0
 	github.com/go-co-op/gocron v1.15.0
 	github.com/kkyr/fig v0.3.0
 	github.com/matishsiao/goInfo v0.0.0-20210923090445-da2e3fa8d45f
 	github.com/mitchellh/go-homedir v1.1.0
+	github.com/pbnjay/memory v0.0.0-20210728143218-7b4eea64cf58
 	github.com/pterm/pterm v0.12.42
 	github.com/rs/zerolog v1.27.0
 	github.com/urfave/cli/v2 v2.10.3

@@ -6,15 +6,23 @@ import (
 	"strings"
 	"time"
 
+	"code.cloudfoundry.org/bytefmt"
 	"github.com/comunidade-shallom/peristera/pkg/config"
 	"github.com/comunidade-shallom/peristera/pkg/support"
 	"github.com/matishsiao/goInfo"
+	"github.com/pbnjay/memory"
 	"github.com/pterm/pterm"
 )
 
+type Memory struct {
+	Free  uint64
+	Total uint64
+}
+
 type Data struct {
-	IPs  []net.Addr
-	Info goInfo.GoInfoObject
+	IPs    []net.Addr
+	Memory Memory
+	Info   goInfo.GoInfoObject
 }
 
 func New() (Data, error) {
@@ -28,9 +36,16 @@ func New() (Data, error) {
 		return Data{}, err
 	}
 
+	free := memory.FreeMemory()
+	total := memory.TotalMemory()
+
 	return Data{
 		IPs:  ips,
 		Info: info,
+		Memory: Memory{
+			Free:  free,
+			Total: total,
+		},
 	}, nil
 }
 
@@ -51,7 +66,9 @@ func (d Data) MarkdownV2(head string) string {
 	builder.WriteString("\n*GoOS:* " + support.AddSlashes(info.GoOS))
 	builder.WriteString("\n*Core:* " + support.AddSlashes(info.Core))
 	builder.WriteString("\n*OS:* " + support.AddSlashes(info.OS))
-	builder.WriteString("\n*Kernal:* " + support.AddSlashes(info.Kernel))
+	builder.WriteString("\n*Kernel:* " + support.AddSlashes(info.Kernel))
+	builder.WriteString("\n*Memory:* " + support.AddSlashes(bytefmt.ByteSize(d.Memory.Total)))
+	builder.WriteString("\n*Memory Free:* " + support.AddSlashes(bytefmt.ByteSize(d.Memory.Free)))
 
 	builder.WriteString("\n\n*System IPs*\n")
 
@@ -78,6 +95,8 @@ func (d Data) Println() error {
 			{"Core", info.Core},
 			{"OS", info.OS},
 			{"Kernel", info.Kernel},
+			{"Memory", bytefmt.ByteSize(d.Memory.Total)},
+			{"Memory Free", bytefmt.ByteSize(d.Memory.Free)},
 		}).Srender()
 	if err != nil {
 		return err
