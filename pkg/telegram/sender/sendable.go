@@ -50,7 +50,7 @@ func SendableWorker(ctx context.Context, in <-chan Sendable, bot *telebot.Bot, d
 		}
 
 		err := db.DB().Update(func(txn *badger.Txn) error {
-			return txn.Set(current.Hash(), []byte(time.Now().GoString()))
+			return txn.Set(current.Hash(), []byte(time.Now().Format(time.RFC3339)))
 		})
 		if err != nil {
 			logger.Error().
