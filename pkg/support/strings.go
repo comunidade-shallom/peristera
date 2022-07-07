@@ -5,7 +5,7 @@ import (
 	"unsafe"
 )
 
-var specials = []rune{'.', '\'', '(', ')', '-', '+'}
+var specials = []rune{'.', '\'', '(', ')', '-', '+', '!'}
 
 func AddSlashes(str string) string {
 	var buf bytes.Buffer

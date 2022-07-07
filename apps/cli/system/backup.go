@@ -66,18 +66,24 @@ var BackupCmd = &cli.Command{
 			return err
 		}
 
-		document := telegram.Document(
-			file,
-			fmt.Sprintf("*System Notify*\n\n*Peristera Backup:\n*%s", time.Now().Format(time.RFC3339)),
+		caption := fmt.Sprintf(
+			"```%s```\n\n*System Notify:*\n`%s`\n\n*Peristera Backup:*\n`%s`",
+			cmd.Args().First(),
+			config.Hostname(),
+			time.Now().Format(time.RFC3339),
 		)
 
+		document := telegram.Document(file, caption)
+
 		for _, id := range roots {
+			document.Caption = caption // it changes over the loop, missing scapes
+
 			_, err = bot.Send(&telebot.User{
 				ID: id,
 			}, document, telebot.ModeMarkdownV2)
 
 			if err != nil {
-				return err
+				logger.Warn().Err(err).Int64("userId", id).Msg("Fail to sent backup file")
 			}
 		}
 
