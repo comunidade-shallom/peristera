@@ -50,6 +50,7 @@ func (h Commands) Setup(ctx context.Context, bot *telebot.Bot) error {
 	root.Use(restrictTo(h.cfg.Telegram.Roots, "roots"))
 	root.Handle("/exec", h.Exec)
 	root.Handle("/backup", h.Backup)
+	root.Handle("/load", h.Load)
 
 	return bot.SetCommands([]telebot.Command{
 		{

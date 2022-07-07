@@ -21,8 +21,9 @@ func Open(path string) (Database, error) {
 
 	db, err := badger.Open(
 		badger.DefaultOptions(path).
-			WithIndexCacheSize(5 << 20). //nolint:gomnd // 5mb
-			WithValueLogMaxEntries(50),  //nolint:gomnd
+			WithMaxLevels(2).            //nolint:gomnd
+			WithValueLogMaxEntries(50).  //nolint:gomnd
+			WithIndexCacheSize(5 << 20), //nolint:gomnd // 5mb
 	)
 	if err != nil {
 		return Database{}, err
@@ -47,11 +48,15 @@ func (d Database) Backup(w io.Writer) error {
 	return err
 }
 
+func (d Database) Load(r io.Reader) error {
+	return d.DB().Load(r, 1)
+}
+
 // MissingKeys return missing keys in database.
 func (d Database) MissingKeys(ctx context.Context, keys [][]byte) ([][]byte, error) {
 	out := make([][]byte, 0)
 
-	err := d.db.View(func(txn *badger.Txn) error {
+	err := d.DB().View(func(txn *badger.Txn) error {
 		for _, key := range keys {
 			_, err := txn.Get(key)
 

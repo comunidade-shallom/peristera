@@ -46,6 +46,12 @@ func (h Commands) Backup(tx telebot.Context) error {
 		return err
 	}
 
+	defer func() {
+		name := file.Name()
+		_ = file.Close()
+		_ = os.Remove(name)
+	}()
+
 	logger.Debug().Msg("Backup write on disk")
 
 	if err = tx.Notify(telebot.UploadingDocument); err != nil {
