@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/comunidade-shallom/peristera/pkg/config"
+	"github.com/comunidade-shallom/peristera/pkg/database"
 	"github.com/comunidade-shallom/peristera/pkg/ytube"
 	"github.com/rs/zerolog"
 	"gopkg.in/telebot.v3"
@@ -13,10 +14,12 @@ import (
 type Commands struct {
 	cfg     config.AppConfig
 	youtube ytube.Service
+	db      database.Database
 }
 
-func New(cfg config.AppConfig, youtube ytube.Service) Commands {
+func New(cfg config.AppConfig, youtube ytube.Service, db database.Database) Commands {
 	return Commands{
+		db:      db,
 		cfg:     cfg,
 		youtube: youtube,
 	}
@@ -46,6 +49,7 @@ func (h Commands) Setup(ctx context.Context, bot *telebot.Bot) error {
 	root := bot.Group()
 	root.Use(restrictTo(h.cfg.Telegram.Roots, "roots"))
 	root.Handle("/exec", h.Exec)
+	root.Handle("/backup", h.Backup)
 
 	return bot.SetCommands([]telebot.Command{
 		{

@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"errors"
+	"io"
 	"time"
 
 	badger "github.com/dgraph-io/badger/v3"
@@ -34,6 +35,16 @@ func Open(path string) (Database, error) {
 
 func (d Database) DB() *badger.DB {
 	return d.db
+}
+
+func (d Database) Close() error {
+	return d.DB().Close()
+}
+
+func (d Database) Backup(w io.Writer) error {
+	_, err := d.DB().Backup(w, 0)
+
+	return err
 }
 
 // MissingKeys return missing keys in database.
