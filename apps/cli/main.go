@@ -41,7 +41,7 @@ func main() {
 				DefaultText: "info",
 			},
 		},
-		Commands: []*cli.Command{WorkerCmd, system.System},
+		Commands: []*cli.Command{WorkerCmd, system.SystemCmd},
 		Before:   beforeRun,
 	}
 
