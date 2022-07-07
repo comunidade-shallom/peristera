@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"github.com/comunidade-shallom/peristera/pkg/support/system"
+	"github.com/comunidade-shallom/peristera/pkg/system"
 	"gopkg.in/telebot.v3"
 )
 

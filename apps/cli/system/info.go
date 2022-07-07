@@ -2,7 +2,7 @@ package system
 
 import (
 	"github.com/comunidade-shallom/peristera/pkg/config"
-	"github.com/comunidade-shallom/peristera/pkg/support/system"
+	"github.com/comunidade-shallom/peristera/pkg/system"
 	"github.com/comunidade-shallom/peristera/pkg/telegram"
 	"github.com/rs/zerolog"
 	"github.com/urfave/cli/v2"
