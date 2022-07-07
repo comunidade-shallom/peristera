@@ -8,6 +8,7 @@ type ctxKey struct{}
 
 type AppConfig struct {
 	Debug       bool     `fig:"-" yaml:"-"`
+	Store       Store    `fig:"store" yaml:"store"`
 	Timezone    string   `fig:"timezone" yaml:"timezone"`
 	Description string   `fig:"description" yaml:"description"`
 	Logger      Logger   `fig:"logger" yaml:"logger"`

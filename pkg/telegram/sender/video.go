@@ -22,10 +22,15 @@ func FromVideo(video ytube.Video, chats Chats) (Video, error) {
 	}, nil
 }
 
-func (v Video) Hash() string {
-	hash := sha256.Sum256([]byte(v.URL))
+func (v Video) Hash() []byte {
+	raw := sha256.Sum256([]byte(v.URL))
+	hash := raw[:]
 
-	return base64.RawStdEncoding.EncodeToString(hash[:])
+	buf := make([]byte, base64.RawStdEncoding.EncodedLen(len(hash)))
+
+	base64.RawStdEncoding.Encode(buf, hash)
+
+	return append([]byte("videos:"), buf...)
 }
 
 func (v Video) Params() []interface{} {

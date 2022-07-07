@@ -25,7 +25,7 @@ func (j *Jobs) LastVideos(ctx context.Context) error {
 }
 
 func (j *Jobs) lastChannelVideos(ctx context.Context, channel config.Channel) error {
-	return j.broadcast(func(chats sender.Chats) ([]sender.Sendable, error) {
+	return j.broadcast(ctx, func(chats sender.Chats) ([]sender.Sendable, error) {
 		logger := j.jobLogger(ctx, "last-videos:"+channel.ID)
 
 		logger.Info().Msg("Loading last videos...")

@@ -1,6 +1,9 @@
 package support
 
-import "bytes"
+import (
+	"bytes"
+	"unsafe"
+)
 
 var specials = []rune{'.', '\'', '(', ')', '-', '+'}
 
@@ -40,4 +43,8 @@ func TruncateString(str string, length int) string {
 	}
 
 	return truncated
+}
+
+func BytesToSring(b []byte) string {
+	return *(*string)(unsafe.Pointer(&b))
 }

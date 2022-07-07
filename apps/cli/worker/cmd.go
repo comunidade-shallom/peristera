@@ -6,6 +6,7 @@ import (
 
 	"github.com/comunidade-shallom/peristera/pkg/config"
 	"github.com/comunidade-shallom/peristera/pkg/cron"
+	"github.com/comunidade-shallom/peristera/pkg/database"
 	"github.com/comunidade-shallom/peristera/pkg/support"
 	"github.com/comunidade-shallom/peristera/pkg/telegram"
 	"github.com/comunidade-shallom/peristera/pkg/telegram/commands"
@@ -20,6 +21,7 @@ type serviceContainer struct {
 	bot     *telebot.Bot
 	youtube ytube.Service
 	logger  zerolog.Logger
+	db      database.Database
 }
 
 var Worker = &cli.Command{
@@ -57,6 +59,11 @@ var Worker = &cli.Command{
 			return err
 		}
 
+		services.db, err = database.Open(cfg.Store.Path)
+		if err != nil {
+			return err
+		}
+
 		services.bot, err = initBot(ctx, services)
 		if err != nil {
 			return err
@@ -74,7 +81,15 @@ var Worker = &cli.Command{
 			logger.Warn().Msg("Cron is disabled")
 		}
 
+		go services.db.Worker(ctx)
+
 		<-ctx.Done()
+
+		err = services.db.DB().Close()
+
+		if err != nil {
+			logger.Warn().Err(err).Msg("Fail to close database")
+		}
 
 		logger.Info().Err(ctx.Err()).Msg("Done")
 
@@ -130,7 +145,12 @@ func initCron(ctx context.Context, services serviceContainer) <-chan error {
 	logger.Info().Msg("Cron is enabled")
 	logger.Debug().Msg("Creating cron jobs")
 
-	jobs, err := cron.New(ctx, services.cfg, services.bot, services.youtube)
+	jobs, err := cron.New(ctx, cron.Options{
+		Config:   services.cfg,
+		Bot:      services.bot,
+		YouTube:  services.youtube,
+		Database: services.db,
+	})
 	if err != nil {
 		logger.Warn().Err(err).Msg("Fail to create cron jobs")
 		out <- err
