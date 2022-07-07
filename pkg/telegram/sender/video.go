@@ -18,7 +18,7 @@ func FromVideo(video ytube.Video, chats Chats) (Video, error) {
 	return Video{
 		Chats: chats,
 		URL:   video.URL(),
-		Title: video.Title(),
+		Title: video.Title,
 	}, nil
 }
 

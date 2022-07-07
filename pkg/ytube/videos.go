@@ -41,8 +41,7 @@ func (s Service) LastVideos(ctx context.Context, channelID string, maxResults in
 
 	for _, item := range res.Items {
 		vid, err := FromSearchResult(item)
-
-		if err == nil {
+		if err != nil {
 			pterm.Warning.Printfln("Parse error: %s", err.Error())
 
 			continue

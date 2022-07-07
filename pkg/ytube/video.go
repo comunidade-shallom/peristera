@@ -1,33 +1,16 @@
 package ytube
 
 import (
-	"encoding/json"
-	"time"
-
 	"google.golang.org/api/youtube/v3"
 )
 
-type VideoID struct {
-	VideoID string `json:"videoId"`
-}
-
-type VideoThumbnails struct {
-	Height int    `json:"height"`
-	Width  int    `json:"width"`
-	URL    string `json:"url"`
-}
-
-type VideoSnippet struct {
-	Title        string                     `json:"title"`
-	ChannelTitle string                     `json:"channelTitle"`
-	PublishedAt  time.Time                  `json:"publishedAt"`
-	Description  time.Time                  `json:"description"`
-	Thumbnails   map[string]VideoThumbnails `json:"thumbnails"`
-}
-
 type Video struct {
-	VideoID VideoID      `json:"id"`
-	Snippet VideoSnippet `json:"snippet"`
+	VideoID     string  `json:"id"`
+	Title       string  `json:"title"`
+	Thumbnail   string  `json:"thumbnail"`
+	PublishedAt string  `json:"publishedAt"`
+	Description string  `json:"description"`
+	Channel     Channel `json:"channel"`
 }
 
 type Channel struct {
@@ -36,26 +19,24 @@ type Channel struct {
 }
 
 func FromSearchResult(raw *youtube.SearchResult) (Video, error) {
-	var res Video
+	snippet := raw.Snippet
 
-	bt, err := raw.MarshalJSON()
-	if err != nil {
-		return res, err
-	}
+	return Video{
+		VideoID:     raw.Id.VideoId,
+		Thumbnail:   snippet.Thumbnails.High.Url,
+		PublishedAt: snippet.PublishedAt,
+		Description: snippet.Description,
+		Channel: Channel{
+			Name: snippet.ChannelTitle,
+			ID:   snippet.ChannelId,
+		},
+	}, nil
+}
 
-	err = json.Unmarshal(bt, &res)
-
-	return res, err
+func (v Video) ID() string {
+	return v.VideoID
 }
 
 func (v Video) URL() string {
-	return "https://youtu.be/" + v.VideoID.VideoID
-}
-
-func (v Video) Title() string {
-	return v.Snippet.Title
-}
-
-func (v Video) ToBotContent() (interface{}, error) {
-	return v.URL(), nil
+	return "https://youtu.be/" + v.ID()
 }
