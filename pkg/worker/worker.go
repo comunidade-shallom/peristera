@@ -5,17 +5,22 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/comunidade-shallom/peristera/pkg/config"
 	"github.com/comunidade-shallom/peristera/pkg/cron"
 	"github.com/comunidade-shallom/peristera/pkg/database"
+	"github.com/comunidade-shallom/peristera/pkg/telegram/commands"
+	"github.com/comunidade-shallom/peristera/pkg/ytube"
 	"github.com/rs/zerolog"
 	"gopkg.in/telebot.v3"
 )
 
 type Worker struct {
-	bot  *telebot.Bot
-	jobs *cron.Jobs
-	db   database.Database
-	stop chan error
+	bot     *telebot.Bot
+	jobs    *cron.Jobs
+	db      database.Database
+	youtube ytube.Service
+	cfg     config.AppConfig
+	stop    chan error
 }
 
 func (w *Worker) Start(parentCtx context.Context) {
@@ -108,11 +113,21 @@ func (w *Worker) TelegramWorker(ctx context.Context, wg *sync.WaitGroup) {
 	go func() {
 		logger.Info().Msg("Starting telegram bot...")
 
+		cmds := commands.New(w.cfg, w.youtube, w.db)
+
+		err := cmds.Setup(ctx, w.bot)
+		if err != nil {
+			logger.Warn().Err(err).Msg("Fail start telegram bot")
+			w.stop <- err
+
+			return
+		}
+
 		w.bot.Start()
 	}()
 
 	<-ctx.Done()
-	logger.Warn().Err(ctx.Err()).Msg("Stopping bot...")
+	logger.Warn().Err(ctx.Err()).Msg("Stopping telegram bot...")
 	w.bot.Stop()
 	logger.Warn().Msg("Telegram stopped")
 }

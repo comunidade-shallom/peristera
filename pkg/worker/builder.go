@@ -17,7 +17,9 @@ func New(ctx context.Context, cfg config.AppConfig, enableCron bool) (*Worker, e
 		Str("fn", "worker:builder").
 		Logger()
 
-	serv := &Worker{}
+	serv := &Worker{
+		cfg: cfg,
+	}
 
 	var err error
 
@@ -28,7 +30,7 @@ func New(ctx context.Context, cfg config.AppConfig, enableCron bool) (*Worker, e
 
 	logger.Info().Msg("Database opened")
 
-	youtube, err := ytube.NewService(ctx, cfg.Youtube)
+	serv.youtube, err = ytube.NewService(ctx, cfg.Youtube)
 	if err != nil {
 		return serv, err
 	}
@@ -46,7 +48,7 @@ func New(ctx context.Context, cfg config.AppConfig, enableCron bool) (*Worker, e
 		serv.jobs, err = cron.New(ctx, cron.Options{
 			Bot:      serv.bot,
 			Database: serv.db,
-			YouTube:  youtube,
+			YouTube:  serv.youtube,
 			Config:   cfg,
 		})
 		if err != nil {
