@@ -8,6 +8,7 @@ import (
 var (
 	NoAdminsDefined = errors.Business("No admins defined", "SY:001")
 	NoRootssDefined = errors.Business("No roots defined", "SY:002")
+	BackupIsEmpty   = errors.Business("Backup is empty", "SY:003")
 )
 
 var ErrOnlyNotifyTrue = errors.Business("only notify true is supported", "SY:003")

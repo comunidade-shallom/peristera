@@ -33,7 +33,7 @@ var BackupCmd = &cli.Command{
 			return ErrOnlyNotifyTrue
 		}
 
-		forse := cmd.Bool("force")
+		force := cmd.Bool("force")
 
 		cfg := *config.Ctx(cmd.Context)
 
@@ -71,7 +71,7 @@ var BackupCmd = &cli.Command{
 
 		db, err := database.Open(cfg.Store.Path)
 		if err != nil {
-			if forse {
+			if force {
 				notifyOnError(err)
 			}
 
@@ -86,7 +86,7 @@ var BackupCmd = &cli.Command{
 
 		file, destroy, err := system.Backup(cmd.Context, db)
 		if err != nil {
-			if forse {
+			if force {
 				notifyOnError(err)
 			}
 
@@ -96,6 +96,21 @@ var BackupCmd = &cli.Command{
 		defer destroy()
 
 		logger.Info().Msgf("Temp backup file created: %s", file.Name())
+
+		st, err := file.Stat()
+		if err != nil {
+			if force {
+				notifyOnError(err)
+			}
+
+			return err
+		}
+
+		if st.Size() == 0 {
+			notifyOnError(BackupIsEmpty)
+
+			return BackupIsEmpty
+		}
 
 		caption := fmt.Sprintf(
 			"*%s*\n\n*System Notify:*\n`%s`\n\n*Peristera Backup:*\n`%s`",
