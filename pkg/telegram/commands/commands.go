@@ -43,6 +43,8 @@ func (h Commands) Setup(ctx context.Context, bot *telebot.Bot) error {
 	bot.Handle("/location", h.Address)
 	bot.Handle("/endereco", h.Address)
 	bot.Handle("/endereço", h.Address)
+	bot.Handle("/agenda", h.Calendar)
+	bot.Handle("/calendar", h.Calendar)
 
 	adm := bot.Group()
 	adm.Use(restrictTo(h.cfg.Telegram.Admins, "admins"))
@@ -64,6 +66,10 @@ func (h Commands) Setup(ctx context.Context, bot *telebot.Bot) error {
 		{
 			Text:        "endereco",
 			Description: "Nosso endereço",
+		},
+		{
+			Text:        "agenda",
+			Description: "Nossos horários de culto",
 		},
 		{
 			Text:        "oferta",

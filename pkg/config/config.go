@@ -11,6 +11,7 @@ type AppConfig struct {
 	Store       Store    `fig:"store" yaml:"store"`
 	Timezone    string   `fig:"timezone" yaml:"timezone"`
 	Description string   `fig:"description" yaml:"description"`
+	Calendar    string   `fig:"calendar" yaml:"calendar"`
 	Logger      Logger   `fig:"logger" yaml:"logger"`
 	Telegram    Telegram `fig:"telegram" yaml:"telegram"`
 	Location    Location `fig:"location" yaml:"location"`
