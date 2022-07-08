@@ -10,6 +10,8 @@ import (
 	"gopkg.in/telebot.v3"
 )
 
+const entryTTL = time.Hour * 720 // 30 days
+
 type Recipients interface {
 	Recipients() []telebot.Recipient
 }
@@ -31,7 +33,8 @@ func SendableWorker(ctx context.Context, in <-chan Sendable, bot *telebot.Bot, d
 
 	for msg := range in {
 		current := msg
-		logger := parent.With().Bytes("hash", current.Hash()).Logger()
+		hash := current.Hash()
+		logger := parent.With().Bytes("hash", hash).Logger()
 
 		logger.Info().Msg("Sending message...")
 
@@ -40,26 +43,30 @@ func SendableWorker(ctx context.Context, in <-chan Sendable, bot *telebot.Bot, d
 			if err != nil {
 				logger.Error().
 					Err(err).
-					Str("Recipient", recipient.Recipient()).
+					Str("recipient", recipient.Recipient()).
 					Msg("Fail to send message")
-			} else {
-				logger.Debug().
-					Str("Recipient", recipient.Recipient()).
-					Msg("Message sent")
+
+				continue
 			}
+
+			logger.Debug().
+				Str("recipient", recipient.Recipient()).
+				Msg("Message sent")
 		}
 
 		err := db.DB().Update(func(txn *badger.Txn) error {
-			return txn.Set(current.Hash(), []byte(time.Now().Format(time.RFC3339)))
+			value := []byte(time.Now().Format(time.RFC3339))
+			entry := badger.NewEntry(hash, value).WithTTL(entryTTL)
+
+			return txn.SetEntry(entry)
 		})
 		if err != nil {
 			logger.Error().
 				Err(err).
-				Bytes("hash", current.Hash()).
 				Msg("Fail store message")
-		} else {
-			logger.Info().Msg("Message stored...")
 		}
+
+		logger.Info().Msg("Message stored...")
 	}
 
 	parent.Warn().Msg("Sendable worker is stopped")
