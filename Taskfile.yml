@@ -111,4 +111,4 @@ tasks:
   release:snapshot:
     desc: release snapshot mode
     cmds:
-      - goreleaser release --snapshot --rm-dist
+      - goreleaser release --parallelism 2 --snapshot --rm-dist
