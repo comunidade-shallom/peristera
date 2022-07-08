@@ -52,7 +52,7 @@ var InfoCmd = &cli.Command{
 				}, msg, telebot.ModeMarkdownV2)
 
 				if err != nil {
-					return err
+					logger.Warn().Err(err).Int64("userId", id).Msg("Fail to sent info")
 				}
 			}
 
