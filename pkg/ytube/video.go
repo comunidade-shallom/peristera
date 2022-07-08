@@ -26,6 +26,7 @@ func FromSearchResult(raw *youtube.SearchResult) (Video, error) {
 		Thumbnail:   snippet.Thumbnails.High.Url,
 		PublishedAt: snippet.PublishedAt,
 		Description: snippet.Description,
+		Title:       snippet.Title,
 		Channel: Channel{
 			Name: snippet.ChannelTitle,
 			ID:   snippet.ChannelId,
