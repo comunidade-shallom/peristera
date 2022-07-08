@@ -6,6 +6,7 @@ import (
 
 	"github.com/comunidade-shallom/peristera/pkg/config"
 	"github.com/comunidade-shallom/peristera/pkg/database"
+	"github.com/comunidade-shallom/peristera/pkg/support"
 	"github.com/comunidade-shallom/peristera/pkg/system"
 	"github.com/comunidade-shallom/peristera/pkg/telegram"
 	"github.com/rs/zerolog"
@@ -54,8 +55,8 @@ var BackupCmd = &cli.Command{
 
 		notifyOnError := func(err error) {
 			msg := fmt.Sprintf(
-				"```%s```\n\n*System Notify:*\n`%s`\n\n*Backup Error:*\n`%s`\n\n*System time:*\n`%s`",
-				cmd.Args().First(),
+				"*%s*\n\n*System Notify:*\n`%s`\n\n*Backup Error:*\n`%s`\n\n*System time:*\n`%s`",
+				support.AddSlashes(cmd.Args().First()),
 				config.Hostname(),
 				err.Error(),
 				time.Now().Format(time.RFC3339),
@@ -97,8 +98,8 @@ var BackupCmd = &cli.Command{
 		logger.Info().Msgf("Temp backup file created: %s", file.Name())
 
 		caption := fmt.Sprintf(
-			"```%s```\n\n*System Notify:*\n`%s`\n\n*Peristera Backup:*\n`%s`",
-			cmd.Args().First(),
+			"*%s*\n\n*System Notify:*\n`%s`\n\n*Peristera Backup:*\n`%s`",
+			support.AddSlashes(cmd.Args().First()),
 			config.Hostname(),
 			time.Now().Format(time.RFC3339),
 		)
