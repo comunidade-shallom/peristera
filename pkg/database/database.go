@@ -21,9 +21,9 @@ func Open(path string) (Database, error) {
 
 	db, err := badger.Open(
 		badger.DefaultOptions(path).
-			WithMaxLevels(2).            //nolint:gomnd
-			WithValueLogMaxEntries(50).  //nolint:gomnd
-			WithIndexCacheSize(5 << 20), //nolint:gomnd // 5mb
+			WithMaxLevels(3).             //nolint:gomnd
+			WithValueLogMaxEntries(50).   //nolint:gomnd
+			WithIndexCacheSize(20 << 20), //nolint:gomnd // 20mb
 	)
 	if err != nil {
 		return Database{}, err
