@@ -22,11 +22,17 @@ var BackupCmd = &cli.Command{
 			Usage:    "send information to roots",
 			Required: true,
 		},
+		&cli.BoolFlag{
+			Name:  "force",
+			Usage: "force notify even if got error",
+		},
 	},
 	Action: func(cmd *cli.Context) error {
 		if !cmd.Bool("notify") {
 			return ErrOnlyNotifyTrue
 		}
+
+		forse := cmd.Bool("force")
 
 		cfg := *config.Ctx(cmd.Context)
 
@@ -41,8 +47,33 @@ var BackupCmd = &cli.Command{
 			Str("context", "system").
 			Logger()
 
+		bot, err := telegram.NewBot(cfg)
+		if err != nil {
+			return err
+		}
+
+		notifyOnError := func(err error) {
+			msg := fmt.Sprintf(
+				"```%s```\n\n*System Notify:*\n`%s`\n\n*Backup Error:*\n`%s`\n\n*System time:*\n`%s`",
+				cmd.Args().First(),
+				config.Hostname(),
+				err.Error(),
+				time.Now().Format(time.RFC3339),
+			)
+
+			for _, id := range roots {
+				_, _ = bot.Send(&telebot.User{
+					ID: id,
+				}, msg, telebot.ModeMarkdownV2)
+			}
+		}
+
 		db, err := database.Open(cfg.Store.Path)
 		if err != nil {
+			if forse {
+				notifyOnError(err)
+			}
+
 			return err
 		}
 
@@ -54,17 +85,16 @@ var BackupCmd = &cli.Command{
 
 		file, destroy, err := system.Backup(cmd.Context, db)
 		if err != nil {
+			if forse {
+				notifyOnError(err)
+			}
+
 			return err
 		}
 
 		defer destroy()
 
 		logger.Info().Msgf("Temp backup file created: %s", file.Name())
-
-		bot, err := telegram.NewBot(cfg)
-		if err != nil {
-			return err
-		}
 
 		caption := fmt.Sprintf(
 			"```%s```\n\n*System Notify:*\n`%s`\n\n*Peristera Backup:*\n`%s`",
