@@ -54,18 +54,25 @@ var BackupCmd = &cli.Command{
 		}
 
 		notifyOnError := func(err error) {
+			logger.Warn().Msg("Notify on error...")
+
 			msg := fmt.Sprintf(
-				"*%s*\n\n*System Notify:*\n`%s`\n\n*Backup Error:*\n`%s`\n\n*System time:*\n`%s`",
+				"*%s*\n\n*🖥️ System Notify:*\n`%s`\n\n*🔴 Backup Error:*\n`%s`\n\n*🕰️ System time:*\n`%s`\n\n📁 `%s`",
 				support.AddSlashes(cmd.Args().First()),
 				config.Hostname(),
 				err.Error(),
 				time.Now().Format(time.RFC3339),
+				cfg.Store.Path,
 			)
 
 			for _, id := range roots {
-				_, _ = bot.Send(&telebot.User{
+				_, err = bot.Send(&telebot.User{
 					ID: id,
 				}, msg, telebot.ModeMarkdownV2)
+
+				if err != nil {
+					logger.Warn().Err(err).Int64("userId", id).Msg("Fail to sent notify")
+				}
 			}
 		}
 
@@ -79,7 +86,7 @@ var BackupCmd = &cli.Command{
 		}
 
 		defer func() {
-			_ = db.Close()
+			logger.Warn().Err(db.Close()).Msg("Database closed.")
 		}()
 
 		logger.Debug().Msg("Generating backup...")
@@ -113,10 +120,11 @@ var BackupCmd = &cli.Command{
 		}
 
 		caption := fmt.Sprintf(
-			"*%s*\n\n*System Notify:*\n`%s`\n\n*Peristera Backup:*\n`%s`",
+			"*%s*\n\n*🖥️ System Notify:*\n`%s`\n\n*🗄️ Peristera Backup:*\n`%s`\n\n📁`%s`",
 			support.AddSlashes(cmd.Args().First()),
 			config.Hostname(),
 			time.Now().Format(time.RFC3339),
+			cfg.Store.Path,
 		)
 
 		document := telegram.Document(file, caption)

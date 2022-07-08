@@ -27,9 +27,23 @@ func (h Commands) Backup(tx telebot.Context) error {
 		return err
 	}
 
+	defer destroy()
+
 	logger.Info().Msgf("Temp backup file created: %s", file.Name())
 
-	defer destroy()
+	st, err := file.Stat()
+	if err != nil {
+		return err
+	}
+
+	if st.Size() == 0 {
+		logger.Warn().Msg("Backup file is empty")
+
+		return tx.Reply(
+			fmt.Sprintf("🪣 Backup file is empty\n\n📁 `%s`", h.cfg.Store.Path),
+			telebot.ModeMarkdownV2,
+		)
+	}
 
 	logger.Debug().Msg("Backup write on disk")
 
@@ -38,9 +52,10 @@ func (h Commands) Backup(tx telebot.Context) error {
 	}
 
 	caption := fmt.Sprintf(
-		"*System:* `%s`\n\n *Peristera Backup:*\n `%s`",
+		"*🖥️ System:* `%s`\n\n *🗄️ Peristera Backup:*\n `%s`\n\n📁 `%s`",
 		config.Hostname(),
 		time.Now().Format(time.RFC3339),
+		h.cfg.Store.Path,
 	)
 
 	document := telegram.Document(file, caption)
