@@ -13,6 +13,7 @@ type AppConfig struct {
 	Description string   `fig:"description" yaml:"description"`
 	Logger      Logger   `fig:"logger" yaml:"logger"`
 	Telegram    Telegram `fig:"telegram" yaml:"telegram"`
+	Location    Location `fig:"location" yaml:"location"`
 	Youtube     YouTube  `fig:"youtube" yaml:"youtube"`
 	Pix         Pix      `fig:"pix" yaml:"pix"`
 	Cron        Cron     `fig:"cron" yaml:"cron"`

@@ -35,10 +35,14 @@ func (h Commands) Setup(ctx context.Context, bot *telebot.Bot) error {
 	bot.Use(useLogger(logger))
 
 	bot.Handle("/start", h.Start)
+	bot.Handle("/sobre", h.Start)
 	bot.Handle("/pix", h.Pix)
 	bot.Handle("/oferta", h.Pix)
-	bot.Handle("/sobre", h.Start)
 	bot.Handle("/videos", h.Videos)
+	bot.Handle("/address", h.Address)
+	bot.Handle("/location", h.Address)
+	bot.Handle("/endereco", h.Address)
+	bot.Handle("/endereço", h.Address)
 
 	adm := bot.Group()
 	adm.Use(restrictTo(h.cfg.Telegram.Admins, "admins"))
@@ -56,6 +60,10 @@ func (h Commands) Setup(ctx context.Context, bot *telebot.Bot) error {
 		{
 			Text:        "sobre",
 			Description: "Informações sobre a Shallom em Meriti",
+		},
+		{
+			Text:        "endereco",
+			Description: "Nosso endereço",
 		},
 		{
 			Text:        "oferta",
