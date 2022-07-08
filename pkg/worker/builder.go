@@ -28,6 +28,12 @@ func New(ctx context.Context, cfg config.AppConfig, enableCron bool) (*Worker, e
 		return serv, err
 	}
 
+	defer func() {
+		if err != nil {
+			logger.Warn().Err(serv.db.Close()).Msg("Close database")
+		}
+	}()
+
 	logger.Info().Msg("Database opened")
 
 	serv.youtube, err = ytube.NewService(ctx, cfg.Youtube)
