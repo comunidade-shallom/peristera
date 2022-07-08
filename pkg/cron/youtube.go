@@ -44,12 +44,15 @@ func (j *Jobs) lastChannelVideos(ctx context.Context, channel config.Channel) er
 		res := make([]sender.Sendable, length)
 
 		for index, vid := range vids {
-			logger.Info().Msgf("Video: %s", vid.Title)
-
 			msg, err := sender.FromVideo(vid, chats)
 			if err != nil {
 				return make([]sender.Sendable, 0), err
 			}
+
+			logger.Info().
+				Str("id", vid.ID()).
+				Str("title", vid.Title).
+				Msgf("Video loaded")
 
 			res[index] = msg
 		}

@@ -179,7 +179,7 @@ func (j *Jobs) filter(ctx context.Context, in []sender.Sendable) ([]sender.Senda
 		keys[index] = m.Hash()
 	}
 
-	logger.Debug().Msg("Filtering messages...")
+	logger.Info().Msg("Filtering messages...")
 
 	keys, err := j.database.MissingKeys(ctx, keys)
 	if err != nil {
@@ -187,7 +187,7 @@ func (j *Jobs) filter(ctx context.Context, in []sender.Sendable) ([]sender.Senda
 	}
 
 	if len(keys) == 0 {
-		logger.Debug().Msg("No messages to send")
+		logger.Warn().Msg("No messages to send")
 
 		return []sender.Sendable{}, nil
 	}
@@ -211,6 +211,8 @@ func (j *Jobs) filter(ctx context.Context, in []sender.Sendable) ([]sender.Senda
 			logger.Warn().Bytes("hash", hash).Msg("Message is already sent")
 		}
 	}
+
+	logger.Info().Msgf("Messages able to be send: %v", len(out))
 
 	return out, nil
 }

@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/comunidade-shallom/peristera/pkg/config"
-	"github.com/pterm/pterm"
+	"github.com/rs/zerolog"
 	"google.golang.org/api/option"
 	"google.golang.org/api/youtube/v3"
 )
@@ -39,10 +39,15 @@ func (s Service) LastVideos(ctx context.Context, channelID string, maxResults in
 		return vids, err
 	}
 
+	logger := zerolog.Ctx(ctx).
+		With().
+		Str("fn", "youtube:LastVideos").
+		Logger()
+
 	for _, item := range res.Items {
 		vid, err := FromSearchResult(item)
 		if err != nil {
-			pterm.Warning.Printfln("Parse error: %s", err.Error())
+			logger.Warn().Err(err).Msg("Parse error: %s")
 
 			continue
 		}
