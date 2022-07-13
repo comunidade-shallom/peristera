@@ -39,6 +39,8 @@ var BackupCmd = &cli.Command{
 
 		roots := cfg.Telegram.Roots
 
+		host := config.Hostname() + " (" + config.Version() + ")"
+
 		if len(roots) == 0 {
 			return NoAdminsDefined
 		}
@@ -59,7 +61,7 @@ var BackupCmd = &cli.Command{
 			msg := fmt.Sprintf(
 				"*%s*\n\n*🖥️ System Notify:*\n`%s`\n\n*🔴 Backup Error:*\n`%s`\n\n*🕰️ System time:*\n`%s`\n\n📁 `%s`",
 				support.AddSlashes(cmd.Args().First()),
-				config.Hostname(),
+				host,
 				err.Error(),
 				time.Now().Format(time.RFC3339),
 				cfg.Store.Path,
@@ -122,7 +124,7 @@ var BackupCmd = &cli.Command{
 		caption := fmt.Sprintf(
 			"*%s*\n\n*🖥️ System Notify:*\n`%s`\n\n*🗄️ Peristera Backup:*\n`%s`\n\n📁`%s`",
 			support.AddSlashes(cmd.Args().First()),
-			config.Hostname(),
+			host,
 			time.Now().Format(time.RFC3339),
 			cfg.Store.Path,
 		)

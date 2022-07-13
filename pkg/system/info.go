@@ -76,7 +76,7 @@ func (d Data) MarkdownV2(head string) string {
 		builder.WriteString("\n`" + support.AddSlashes(ip.String()) + "`")
 	}
 
-	builder.WriteString("\n\n*System Time:* \n" + support.AddSlashes(time.Now().Format(time.RFC3339)) + "\n")
+	builder.WriteString("\n\n*System Time:*\n" + support.AddSlashes(time.Now().Format(time.RFC3339)) + "\n")
 	builder.WriteString("\n*Version:*\n" + support.AddSlashes(config.Version()))
 
 	return builder.String()

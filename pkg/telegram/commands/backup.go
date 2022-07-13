@@ -36,11 +36,13 @@ func (h Commands) Backup(tx telebot.Context) error {
 		return err
 	}
 
+	host := config.Hostname() + " (" + config.Version() + ")"
+
 	if st.Size() == 0 {
 		logger.Warn().Msg("Backup file is empty")
 
 		return tx.Reply(
-			fmt.Sprintf("🪣 Backup file is empty\n\n📁 `%s`", h.cfg.Store.Path),
+			fmt.Sprintf("*🖥️ System:* `%s`\n\n🪣 Backup file is empty\n\n📁 `%s`", host, h.cfg.Store.Path),
 			telebot.ModeMarkdownV2,
 		)
 	}
@@ -52,8 +54,8 @@ func (h Commands) Backup(tx telebot.Context) error {
 	}
 
 	caption := fmt.Sprintf(
-		"*🖥️ System:* `%s`\n\n *🗄️ Peristera Backup:*\n `%s`\n\n📁 `%s`",
-		config.Hostname(),
+		"*🖥️ System:* `%s`\n\n*🗄️ Peristera Backup:*\n`%s`\n\n📁 `%s`",
+		host,
 		time.Now().Format(time.RFC3339),
 		h.cfg.Store.Path,
 	)
