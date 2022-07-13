@@ -5,11 +5,14 @@ import (
 
 	"github.com/comunidade-shallom/peristera/pkg/config"
 	"github.com/comunidade-shallom/peristera/pkg/database"
+	"github.com/comunidade-shallom/peristera/pkg/support/errors"
 	"github.com/comunidade-shallom/peristera/pkg/ytube"
 	"github.com/rs/zerolog"
 	"gopkg.in/telebot.v3"
 	"gopkg.in/telebot.v3/middleware"
 )
+
+var ErrHandlerNotFound = errors.Business("handler %s not found", "TC:001")
 
 type Commands struct {
 	cfg     config.AppConfig
@@ -36,17 +39,9 @@ func (h Commands) Setup(ctx context.Context, bot *telebot.Bot) error {
 
 	_ = h.registerMenu(bot)
 
-	bot.Handle("/start", h.Start)
-	bot.Handle("/sobre", h.Start)
-	bot.Handle("/pix", h.Pix)
-	bot.Handle("/oferta", h.Pix)
-	bot.Handle("/videos", h.Videos)
-	bot.Handle("/address", h.Address)
-	bot.Handle("/location", h.Address)
-	bot.Handle("/endereco", h.Address)
-	bot.Handle("/endereço", h.Address)
-	bot.Handle("/agenda", h.Calendar)
-	bot.Handle("/calendar", h.Calendar)
+	if err := h.registerCommands(ctx, bot); err != nil {
+		return err
+	}
 
 	adm := bot.Group()
 	adm.Use(restrictTo(h.cfg.Telegram.Admins, "admins"))
@@ -60,28 +55,24 @@ func (h Commands) Setup(ctx context.Context, bot *telebot.Bot) error {
 	root.Handle("/backup", h.Backup)
 	root.Handle("/load", h.Load)
 
-	return bot.SetCommands([]telebot.Command{
-		{
-			Text:        "sobre",
-			Description: "Informações sobre a Shallom em Meriti",
-		},
-		{
-			Text:        "endereco",
-			Description: "Nosso endereço",
-		},
-		{
-			Text:        "agenda",
-			Description: "Nossos horários de culto",
-		},
-		{
-			Text:        "oferta",
-			Description: "Informações para ofertar online",
-		},
-		{
-			Text:        "videos",
-			Description: "Últimos vídeos do nosso YouTube",
-		},
-	})
+	return nil
+}
+
+func (h Commands) getHandler(name string) (telebot.HandlerFunc, error) {
+	switch name {
+	case "start":
+		return h.Start, nil
+	case "pix":
+		return h.Pix, nil
+	case "videos":
+		return h.Videos, nil
+	case "address":
+		return h.Address, nil
+	case "calendar":
+		return h.Calendar, nil
+	default:
+		return nil, ErrHandlerNotFound.Msgf(name)
+	}
 }
 
 func (h Commands) registerMenu(bot *telebot.Bot) *telebot.ReplyMarkup {
@@ -108,6 +99,35 @@ func (h Commands) registerMenu(bot *telebot.Bot) *telebot.ReplyMarkup {
 	bot.Handle(&btnYoutube, h.Videos)
 
 	return menu
+}
+
+func (h Commands) registerCommands(ctx context.Context, bot *telebot.Bot) error {
+	logger := zerolog.Ctx(ctx).With().Str("fn", "commands:registerCommands").Logger()
+
+	cfg := h.cfg.Telegram
+	for _, mapper := range cfg.Commands.Mappers {
+		handler, err := h.getHandler(mapper.Handler)
+		if err != nil {
+			return err
+		}
+
+		for _, endpoint := range mapper.Endpoints {
+			bot.Handle(endpoint, handler)
+		}
+
+		logger.Info().Msgf("Handler '%s' registred to %v", mapper.Handler, mapper.Endpoints)
+	}
+
+	cmds := make([]telebot.Command, len(cfg.Commands.SetOf))
+
+	for index, set := range cfg.Commands.SetOf {
+		cmds[index] = telebot.Command{
+			Text:        set.Text,
+			Description: set.Description,
+		}
+	}
+
+	return bot.SetCommands(cmds)
 }
 
 func (h Commands) logger(tx telebot.Context) zerolog.Logger {
