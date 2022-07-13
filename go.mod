@@ -13,8 +13,8 @@ require (
 	github.com/pbnjay/memory v0.0.0-20210728143218-7b4eea64cf58
 	github.com/pterm/pterm v0.12.42
 	github.com/rs/zerolog v1.27.0
-	github.com/urfave/cli/v2 v2.10.3
-	google.golang.org/api v0.86.0
+	github.com/urfave/cli/v2 v2.11.0
+	google.golang.org/api v0.87.0
 	gopkg.in/telebot.v3 v3.0.0
 	gopkg.in/yaml.v3 v3.0.1
 )
