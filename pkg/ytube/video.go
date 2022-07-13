@@ -1,6 +1,8 @@
 package ytube
 
 import (
+	"html"
+
 	"google.golang.org/api/youtube/v3"
 )
 
@@ -36,6 +38,10 @@ func FromSearchResult(raw *youtube.SearchResult) (Video, error) {
 
 func (v Video) ID() string {
 	return v.VideoID
+}
+
+func (v Video) UnescapeTitle() string {
+	return html.UnescapeString(v.Title)
 }
 
 func (v Video) URL() string {

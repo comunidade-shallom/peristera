@@ -49,7 +49,9 @@ func (h Commands) Videos(tx telebot.Context) error {
 		}
 
 		for _, vid := range vids {
-			err = tx.Send(vid.URL())
+			err = tx.Send(
+				fmt.Sprintf("%s\n%s", vid.UnescapeTitle(), vid.URL()),
+			)
 
 			if err != nil {
 				logger.Warn().Err(err).Msg("Error on send")
