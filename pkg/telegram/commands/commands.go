@@ -34,6 +34,8 @@ func (h Commands) Setup(ctx context.Context, bot *telebot.Bot) error {
 
 	bot.Use(useLogger(logger))
 
+	_ = h.registerMenu(bot)
+
 	bot.Handle("/start", h.Start)
 	bot.Handle("/sobre", h.Start)
 	bot.Handle("/pix", h.Pix)
@@ -82,6 +84,42 @@ func (h Commands) Setup(ctx context.Context, bot *telebot.Bot) error {
 	})
 }
 
+func (h Commands) registerMenu(bot *telebot.Bot) *telebot.ReplyMarkup {
+	menu := &telebot.ReplyMarkup{ResizeKeyboard: true}
+
+	bot.Use(useMenu(menu))
+
+	btnAbout := menu.Text("ℹ️ Sobre")
+	btnAgenda := menu.Text("🗓️ Agenda")
+	btnAddress := menu.Text("📍 Endereço")
+	btnPix := menu.Text("🏦 Pix")
+	btnYoutube := menu.Text("📹 YouTube")
+
+	menu.Reply(
+		menu.Row(btnAbout, btnAddress),
+		menu.Row(btnAgenda, btnPix),
+		menu.Row(btnYoutube),
+	)
+
+	bot.Handle(&btnAgenda, h.Calendar)
+	bot.Handle(&btnAddress, h.Address)
+	bot.Handle(&btnAbout, h.Start)
+	bot.Handle(&btnPix, h.Pix)
+	bot.Handle(&btnYoutube, h.Videos)
+
+	return menu
+}
+
 func (h Commands) logger(tx telebot.Context) zerolog.Logger {
 	return tx.Get(loggerKey).(zerolog.Logger) //nolint:forcetypeassert
+}
+
+func (h Commands) menu(tx telebot.Context) *telebot.ReplyMarkup {
+	menu, ok := tx.Get(menuKey).(*telebot.ReplyMarkup)
+
+	if ok {
+		return menu
+	}
+
+	return nil
 }

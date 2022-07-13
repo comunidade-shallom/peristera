@@ -20,5 +20,5 @@ func (h Commands) Address(tx telebot.Context) error {
 		},
 	}
 
-	return tx.Reply(venue)
+	return tx.Reply(venue, h.menu(tx))
 }

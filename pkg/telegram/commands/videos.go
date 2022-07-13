@@ -41,7 +41,7 @@ func (h Commands) Videos(tx telebot.Context) error {
 			msg := fmt.Sprintf("%s: Sem resultados", ch.Name)
 			logger.Warn().Msg(msg)
 
-			if err = tx.Reply(msg); err != nil {
+			if err = tx.Reply(msg, h.menu(tx)); err != nil {
 				return err
 			}
 
@@ -58,6 +58,7 @@ func (h Commands) Videos(tx telebot.Context) error {
 
 		err = tx.Send(
 			fmt.Sprintf("Mais vídeos de %s\n\n%s", ch.Name, ch.GetURL()),
+			h.menu(tx),
 		)
 
 		if err != nil {

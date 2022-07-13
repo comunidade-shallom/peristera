@@ -8,7 +8,10 @@ import (
 	"gopkg.in/telebot.v3"
 )
 
-const loggerKey = "logger"
+const (
+	loggerKey = "logger"
+	menuKey   = "menu"
+)
 
 func useLogger(parent zerolog.Logger) telebot.MiddlewareFunc {
 	return func(next telebot.HandlerFunc) telebot.HandlerFunc {
@@ -23,11 +26,23 @@ func useLogger(parent zerolog.Logger) telebot.MiddlewareFunc {
 
 			cmd := "--"
 
-			if text := tx.Message().Text; strings.HasPrefix(text, "/") {
+			msg := tx.Message()
+
+			if text := msg.Text; strings.HasPrefix(text, "/") {
 				cmd = text
 			}
 
 			logger.Info().Msgf("New trigger (%s)", cmd)
+
+			return next(tx)
+		}
+	}
+}
+
+func useMenu(menu *telebot.ReplyMarkup) telebot.MiddlewareFunc {
+	return func(next telebot.HandlerFunc) telebot.HandlerFunc {
+		return func(tx telebot.Context) error {
+			tx.Set(menuKey, menu)
 
 			return next(tx)
 		}
