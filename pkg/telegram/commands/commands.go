@@ -93,7 +93,7 @@ func (h Commands) registerMenu(bot *telebot.Bot) *telebot.ReplyMarkup {
 	btnAgenda := menu.Text("🗓️ Agenda")
 	btnAddress := menu.Text("📍 Endereço")
 	btnPix := menu.Text("🏦 Pix")
-	btnYoutube := menu.Text("📹 YouTube")
+	btnYoutube := menu.Text("📺 YouTube")
 
 	menu.Reply(
 		menu.Row(btnAbout, btnAddress),
