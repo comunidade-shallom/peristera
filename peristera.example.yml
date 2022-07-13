@@ -1,0 +1,105 @@
+timezone: America/Sao_Paulo
+store:
+  path: /peristera.d/store
+
+cron:
+  last_updates: # https://crontab.guru/
+    # At every 10th minute from 0 through 59 past every hour from 8 through 17 on every day-of-week from Monday through Friday.
+    - 0/30 9-17 * * 1-5
+    # At every 10th minute from 0 through 59 past every hour from 17 through 23.
+    - 0/10 17-23 * * *
+    # At every 10th minute from 0 through 59 past every hour from 8 through 17 on Saturday and Sunday.
+    - 0/10 8-17 * * 6,0
+
+telegram:
+  token:
+  commands:
+    set_of:
+      - text: sobre
+        description: "Informações sobre a Shallom em Meriti"
+      - text: endereco
+        description: "Nosso endereço"
+      - text: agenda
+        description: "Nossos horários de culto"
+      - text: oferta
+        description: "Informações para ofertar online"
+      - text: videos
+        description: "Últimos vídeos do nosso YouTube"
+    mappers:
+      - endpoints: ["/start", "/sobre", "/help", "/ajuda", "ajuda"]
+        handler: start
+      - endpoints: ["/pix", "/oferta", "pix", "oferta"]
+        handler: pix
+      - endpoints: ["/videos", "videos"]
+        handler: videos
+      - endpoints: ["/address", "/endereco", "/endereço", "/location", "address", "andereco", "endereço", "location"]
+        handler: address
+      - endpoints: ["/agenda", "/calendario", "/calendário", "/eventos", "agenda", "eventos", "calendário", "calendario"]
+        handler: calendar
+  roots:
+    # - 0
+
+  admins:
+    # - 0
+
+  broadcast:
+    # - 0
+
+youtube:
+  token:
+  channels:
+    - name: TV Shallom
+      id: UCJjMlNpqp4JmorV6bCLprXg
+      url: https://www.youtube.com/c/TVSHALLOM
+
+pix:
+  key: shallom.financeiro@gmail.com
+  qrcode: iVBORw0KGgoAAAANSUhEUgAABAoAAAQKAQAAAADh36WBAAAFdklEQVR42uzdS47jIBAAUCQfIEfqq8+RcoBIPe1PwFBg92KkEdGrFXKgeN4RVIb0/b/jDwICAgICAgICAsJchFeKceqS0lINeab0dU6QTk+3sY/26c8Ux9MQDwQEBAQEBAQEBIQZCY9mWX3AStrUzpth73nbYRVsyXnP8UJAQEBAQEBAQECYl/Dz+znXFjdpY7QZIqH8ZUBAQEBAQEBAQED4KELueposP61h5W/A1vfZDtvzIiAgICAgICAgIHw0oY6YNsZXbSzDEBAQEBAQEBAQED6QEApJCmyJ+9nVsNiMu+exkAQBAQEBAQEBAQFhXkKI/Ps/btaBgICAgICAgICAMCMhRlh33y/iy4ePZbKG0A0EBAQEBAQEBASE6Qh5EV8nuNzlbqLdMk+jzyHrPXUEBAQEBAQEBASESQn7DGu30syjSlQJ0m9LRkrePG95SwQEBAQEBAQEBITpCMeom0KSNfqE3Pz9ISElEBAQEBAQEBAQEGYkbGlDPLOmitg3fvj4znBxLQwCAgICAgICAgLCpIRYHHJVSLLF6N7wo1esKenAEBAQEBAQEBAQECYl5OV6rCm538QuHcoMnZfoX02OgICAgICAgICAMCNhnbd+ONrwzh2uuPEUkf4/AgQEBAQEBAQEBIRJCXvXEnFUPMyjxKgquyz4I+H0EggICAgICAgICAjTEd6tc+zdr249rKILW+L2enwJBAQEBAQEBAQEhEkJg6LrZjVemlvE8ur4XeOoKmV/ioCAgICAgICAgDAd4XxAx20hSfeIj9fgQL0jyk57vPUFAQEBAQEBAQEBYTpCTNBcvrL0jtl7x+jWl9hcI+dFQEBAQEBAQEBAmJmQhodPDwqpB7F2ifJ+XgQEhL/s3UtOQzEMBdBKLKD73yULqARCQExykz4YGh2Pnqp8ztCNnBgBAQEBAQGhO2HebE3M6zNhefZ9XcyNgICAgICAgICA0JTw/XXbvdURhHwDZPdIXpyTb9dFQEBAQEBAQEBA6Eh4bNbKz5oVA+JvQMW6buyGgICAgICAgICA0JEwDrF3hSQjgjviqrH4uZAEAQEBAQEBAQEBoR0huh7uGiDmgNuWW/tGbA/HERAQEBAQEBAQENoRHk/S9RqajVoiG89fX78+z7XaCAgICAgICAgICO0Ib/sLik/vNY5pU/VI7Hs/NhZHQEBAQEBAQEBAaEuIoXNTl6i/zgHZITE0+XQIAgICAgICAgICQl9CrlWRSXzBVs32SepaN6fdERAQEBAQEBAQEDoS4jm8OOUeAzLGCtdJfDZWREBAQEBAQEBAQOhIuC3l1dcn4rVAGZdpL0XIfREQEBAQEBAQEBD6Ez7it69T5zl5bbZ/GWSFISAgICAgICAgIPQl7Pobxqy/Pah3VX/9GXcEBAQEBAQEBASEdoSK0vwg1KwDNweU8VBTUoGAgICAgICAgIDQkRBF189vMFZN9RI/pkX1yPrnAAEBAQEBAQEBAaEpIR/Ui1kjTo3Fi7uftj8yR0BAQEBAQEBAQOhImCJnZT5/bgCTdxXPxdyfKyAgICAgICAgICC0IzxuGeu1xdfI0ccCNXYyPh1bgYCAgICAgICAgNCRsP6Y5SUXiXlF3GA8JfEICAgICAgICAgIrQnTwfT0a0UUkpyM9ZljZxgCAgICAgICAgLC/yFECj49KD0GnNq3PPb5/Fy2jYCAgICA8N7OHaMADMMwAPz/q9uhEJMq6RpcTqPRcKOGEAQEBIS/Eeqac331kKSSz7bzz2oEBAQEBAQEBASEpoTt39Jfhei+NDn4K08fAQEBAQEBAQEBoSMhshvmec2Nfk2F2v4jo4CAgICAgICAgIDQkXA4CAgICAgICAgICJ0INxG+AKTV3Q04AAAAAElFTkSuQmCC
+  description: |
+    *PARA OFERTAR ONLINE:*
+    https:\/\/comunidadeshallom\.com\.br/oferta
+
+    \-\-\-\-
+
+    *PagSeguro:* https:\/\/bit\.ly/ShallomOfertas
+    *PicPay:* http:\/\/bit\.ly/ShallomOfertasPicPay
+    *PIX:* `shallom\.financeiro@gmail\.com`
+
+location:
+  title: Comunidade Batista Shallom em Meriti
+  address: Av. Cel. Raimundo Sampaio, 155 - Jardim Santa Rosa, São João de Meriti - RJ, 25570-393, Brasil
+  latitude: -22.770003329086784
+  longitude: -43.35208363831043
+  foursquare_id: 4fcb43d6e4b057a7eeda2722
+  google_place_id: ChIJFyRzPGtlmQAR6OeZ08qtn_w
+  google_place_type: church
+
+calendar: |
+  *NOSSA AGENDA*
+
+  *⛪ Culto de celebração*
+  __Domingo às 10h e ás 18h__
+
+  *👨‍👩‍👧‍👦 Mães no altar*
+  __Segunda às 18h__
+
+  *🙏 Culto de oração & libertação*
+  __Terça às 20h__
+
+  *🙏 Sala de oração \(REAJA \- Rede de Adolescentes e Jovens\)*
+  __Sexta às 19:30h__
+
+  *ℹ️ Para mais informações visite nosso site*: https:\/\/comunidadeshallom\.com\.br\/agenda
+
+  📺 [Transmissões online](https://www.youtube.com/c/TVSHALLOM)
+
+description: |
+  Este bot te ajuda a interagir com o conteúdo da *Comunidade Shallom em São João de Meriti*
+
+  Entre em nosso canal do telegram https:\/\/t\.me/comunidadeshallom
+
+  *NOS ACOMPANHE:*
+  🌐 [comunidadeshallom\.com\.br](https://comunidadeshallom.com.br)
+  🎧 [Podcast](https://open.spotify.com/show/1Sy2sfkP3SdhBqlXiA3RYT)
+  📺 [YouTube](https://www.youtube.com/c/TVSHALLOM)
+  🐦 [Twitter](https://twitter.com/ib_shallom)
