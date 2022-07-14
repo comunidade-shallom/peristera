@@ -2,7 +2,6 @@ package commands
 
 import (
 	"strconv"
-	"strings"
 
 	"github.com/rs/zerolog"
 	"gopkg.in/telebot.v3"
@@ -24,13 +23,7 @@ func useLogger(parent zerolog.Logger) telebot.MiddlewareFunc {
 
 			tx.Set(loggerKey, logger)
 
-			cmd := "--"
-
-			msg := tx.Message()
-
-			if text := msg.Text; strings.HasPrefix(text, "/") {
-				cmd = text
-			}
+			cmd := tx.Message().Text
 
 			logger.Info().Msgf("New trigger (%s)", cmd)
 
