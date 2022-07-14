@@ -103,29 +103,31 @@ func (j *Jobs) register(ctx context.Context) error {
 
 	j.scheduler = gocron.NewScheduler(timezone)
 
+	err = j.registerCron(ctx, "last-updates", j.cfg.Cron.LastUpdates, j.LastVideos)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (j *Jobs) registerCron(ctx context.Context, name string, entries []string, jobFun interface{}) error {
 	logger := zerolog.Ctx(ctx).
 		With().
-		Str("context", "jobs:register").
+		Str("context", "jobs:register#"+name).
 		Logger()
 
-	if len(j.cfg.Cron.LastUpdates) == 0 {
-		logger.Warn().Msg("No cron entries from last updates")
+	if len(entries) == 0 {
+		logger.Warn().Msg("No cron entries")
 
 		return nil
 	}
 
-	logger.Info().Msg("Registring last updates")
-
-	lastUpdates := func() error {
-		return j.LastVideos(ctx)
-	}
-
-	j.scheduler.SingletonModeAll()
-
-	for _, entry := range j.cfg.Cron.LastUpdates {
+	for _, entry := range entries {
 		_, err := j.scheduler.
 			Cron(entry).
-			Do(lastUpdates)
+			Do(jobFun, ctx)
 		if err != nil {
 			return err
 		}
