@@ -1,17 +1,12 @@
 package system
 
 import (
-	"fmt"
-	"time"
-
 	"github.com/comunidade-shallom/peristera/pkg/config"
 	"github.com/comunidade-shallom/peristera/pkg/database"
-	"github.com/comunidade-shallom/peristera/pkg/support"
 	"github.com/comunidade-shallom/peristera/pkg/system"
 	"github.com/comunidade-shallom/peristera/pkg/telegram"
 	"github.com/rs/zerolog"
 	"github.com/urfave/cli/v2"
-	"gopkg.in/telebot.v3"
 )
 
 var BackupCmd = &cli.Command{
@@ -39,8 +34,6 @@ var BackupCmd = &cli.Command{
 
 		roots := cfg.Telegram.Roots
 
-		host := config.Hostname() + " (" + config.Version() + ")"
-
 		if len(roots) == 0 {
 			return NoAdminsDefined
 		}
@@ -56,26 +49,7 @@ var BackupCmd = &cli.Command{
 		}
 
 		notifyOnError := func(err error) {
-			logger.Warn().Msg("Notify on error...")
-
-			msg := fmt.Sprintf(
-				"*%s*\n\n*🖥️ System Notify:*\n`%s`\n\n*🔴 Backup Error:*\n`%s`\n\n*🕰️ System time:*\n`%s`\n\n📁 `%s`",
-				support.AddSlashes(cmd.Args().First()),
-				host,
-				err.Error(),
-				time.Now().Format(time.RFC3339),
-				cfg.Store.Path,
-			)
-
-			for _, id := range roots {
-				_, err = bot.Send(&telebot.User{
-					ID: id,
-				}, msg, telebot.ModeMarkdownV2)
-
-				if err != nil {
-					logger.Warn().Err(err).Int64("userId", id).Msg("Fail to sent notify")
-				}
-			}
+			_ = system.NotifyBackupErr(cmd.Context, bot, cmd.Args().First(), roots, err)
 		}
 
 		db, err := database.Open(cfg.Store.Path)
@@ -121,30 +95,6 @@ var BackupCmd = &cli.Command{
 			return BackupIsEmpty
 		}
 
-		caption := fmt.Sprintf(
-			"*%s*\n\n*🖥️ System Notify:*\n`%s`\n\n*🗄️ Peristera Backup:*\n`%s`\n\n📁`%s`",
-			support.AddSlashes(cmd.Args().First()),
-			host,
-			time.Now().Format(time.RFC3339),
-			cfg.Store.Path,
-		)
-
-		document := telegram.Document(file, caption)
-
-		for _, id := range roots {
-			document.Caption = caption // it changes over the loop, missing scapes
-
-			_, err = bot.Send(&telebot.User{
-				ID: id,
-			}, document, telebot.ModeMarkdownV2)
-
-			if err != nil {
-				logger.Warn().Err(err).Int64("userId", id).Msg("Fail to sent backup file")
-			}
-		}
-
-		logger.Info().Msgf("System backup sent do telegram %v", roots)
-
-		return nil
+		return system.NotifyBackup(cmd.Context, bot, cmd.Args().First(), roots, file)
 	},
 }
