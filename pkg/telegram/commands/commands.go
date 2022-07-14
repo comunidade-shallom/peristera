@@ -82,7 +82,10 @@ func (h Commands) getHandler(name string) (telebot.HandlerFunc, error) {
 func (h Commands) registerMenu(ctx context.Context, bot *telebot.Bot) (*telebot.ReplyMarkup, error) {
 	logger := zerolog.Ctx(ctx).With().Str("fn", "commands:registerMenu").Logger()
 
-	menu := &telebot.ReplyMarkup{ResizeKeyboard: true}
+	menu := &telebot.ReplyMarkup{
+		OneTimeKeyboard: true,
+		ResizeKeyboard:  true,
+	}
 
 	bot.Use(useMenu(menu))
 
