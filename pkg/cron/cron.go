@@ -109,6 +109,12 @@ func (j *Jobs) register(ctx context.Context) error {
 		return err
 	}
 
+	err = j.registerCron(ctx, "backup", j.cfg.Cron.Backup, j.Backup)
+
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
