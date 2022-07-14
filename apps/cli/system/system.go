@@ -7,7 +7,7 @@ import (
 
 var (
 	NoAdminsDefined = errors.Business("No admins defined", "SY:001")
-	NoRootssDefined = errors.Business("No roots defined", "SY:002")
+	NoRootsDefined  = errors.Business("No roots defined", "SY:002")
 	BackupIsEmpty   = errors.Business("🪣 Backup is empty", "SY:003")
 )
 

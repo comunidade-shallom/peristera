@@ -35,7 +35,7 @@ var BackupCmd = &cli.Command{
 		roots := cfg.Telegram.Roots
 
 		if len(roots) == 0 {
-			return NoAdminsDefined
+			return NoRootsDefined
 		}
 
 		logger := zerolog.Ctx(cmd.Context).
