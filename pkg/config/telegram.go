@@ -10,9 +10,15 @@ type CommandMapper struct {
 	Handler   string   `fig:"handler" yaml:"handler"`
 }
 
+type MenuMapper struct {
+	Text    string `fig:"text" yaml:"text"`
+	Handler string `fig:"handler" yaml:"handler"`
+}
+
 type TelegramCommands struct {
 	SetOf   []SetOfCommand  `fig:"set_of" yaml:"set_of"`
 	Mappers []CommandMapper `fig:"mappers" yaml:"mappers"`
+	Menu    []MenuMapper    `fig:"menu" yaml:"menu"`
 }
 
 type Telegram struct {

@@ -37,9 +37,13 @@ func (h Commands) Setup(ctx context.Context, bot *telebot.Bot) error {
 
 	bot.Use(useLogger(logger))
 
-	_ = h.registerMenu(bot)
+	_, err := h.registerMenu(ctx, bot)
+	if err != nil {
+		return err
+	}
 
-	if err := h.registerCommands(ctx, bot); err != nil {
+	err = h.registerCommands(ctx, bot)
+	if err != nil {
 		return err
 	}
 
@@ -75,36 +79,42 @@ func (h Commands) getHandler(name string) (telebot.HandlerFunc, error) {
 	}
 }
 
-func (h Commands) registerMenu(bot *telebot.Bot) *telebot.ReplyMarkup {
+func (h Commands) registerMenu(ctx context.Context, bot *telebot.Bot) (*telebot.ReplyMarkup, error) {
+	logger := zerolog.Ctx(ctx).With().Str("fn", "commands:registerMenu").Logger()
+
 	menu := &telebot.ReplyMarkup{ResizeKeyboard: true}
 
 	bot.Use(useMenu(menu))
 
-	btnAbout := menu.Text("ℹ️ Sobre")
-	btnAgenda := menu.Text("🗓️ Agenda")
-	btnAddress := menu.Text("📍 Endereço")
-	btnPix := menu.Text("🏦 Pix")
-	btnYoutube := menu.Text("📺 YouTube")
+	items := h.cfg.Telegram.Commands.Menu
 
-	menu.Reply(
-		menu.Row(btnAbout, btnAddress),
-		menu.Row(btnAgenda, btnPix),
-		menu.Row(btnYoutube),
-	)
+	buttons := make([]telebot.Btn, len(items))
 
-	bot.Handle(&btnAgenda, h.Calendar)
-	bot.Handle(&btnAddress, h.Address)
-	bot.Handle(&btnAbout, h.Start)
-	bot.Handle(&btnPix, h.Pix)
-	bot.Handle(&btnYoutube, h.Videos)
+	for index, item := range items {
+		handler, err := h.getHandler(item.Handler)
+		if err != nil {
+			return menu, err
+		}
 
-	return menu
+		btn := menu.Text(item.Text)
+
+		bot.Handle(&btn, handler)
+
+		buttons[index] = btn
+
+		logger.Info().Msgf("Handler '%s' registred to menu '%s'", item.Handler, item.Text)
+	}
+
+	menu.Reply(menu.Split(2, buttons)...) //nolint:gomnd
+
+	return menu, nil
 }
 
 func (h Commands) registerCommands(ctx context.Context, bot *telebot.Bot) error {
 	logger := zerolog.Ctx(ctx).With().Str("fn", "commands:registerCommands").Logger()
 
 	cfg := h.cfg.Telegram
+
 	for _, mapper := range cfg.Commands.Mappers {
 		handler, err := h.getHandler(mapper.Handler)
 		if err != nil {

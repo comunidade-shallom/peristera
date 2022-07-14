@@ -14,6 +14,17 @@ cron:
 telegram:
   token:
   commands:
+    menu:
+      - text: ℹ️  Sobre
+        handler: start
+      - text: 📍 Endereço
+        handler: address
+      - text: 🗓️ Agenda
+        handler: calendar
+      - text: 🏦 Pix
+        handler: pix
+      - text: 📺 YouTube
+        handler: videos
     set_of:
       - text: sobre
         description: "Informações sobre a Shallom em Meriti"
