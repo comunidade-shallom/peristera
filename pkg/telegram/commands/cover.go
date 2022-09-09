@@ -24,7 +24,13 @@ func (h Commands) Cover(tx telebot.Context) error {
 
 	var size covers.Size
 
-	if replyTo := tx.Message().ReplyTo; replyTo != nil && replyTo.Photo != nil {
+	replyTo := tx.Message().ReplyTo
+
+	if replyTo == nil {
+		payload := strings.TrimSpace(tx.Message().Payload)
+
+		size, text = parseCoverPayload(payload)
+	} else if replyTo.Photo != nil {
 		size = covers.Size{
 			Width:  replyTo.Photo.Width,
 			Height: replyTo.Photo.Height,
@@ -32,9 +38,8 @@ func (h Commands) Cover(tx telebot.Context) error {
 
 		text = replyTo.Caption
 	} else {
-		payload := strings.TrimSpace(tx.Message().Payload)
-
-		size, text = parseCoverPayload(payload)
+		text = replyTo.Text
+		size = covers.ParseSize(strings.TrimSpace(tx.Message().Payload))
 	}
 
 	if len(text) == 0 {
