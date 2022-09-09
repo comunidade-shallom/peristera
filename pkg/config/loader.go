@@ -6,6 +6,7 @@ import (
 	"path"
 	"path/filepath"
 
+	"github.com/comunidade-shallom/diakonos/pkg/sources"
 	"github.com/comunidade-shallom/peristera/pkg/support"
 	"github.com/comunidade-shallom/peristera/pkg/support/errors"
 	"github.com/creasty/defaults"
@@ -85,6 +86,27 @@ func applyDefaults(cfg AppConfig) (AppConfig, error) {
 
 	if cfg.Youtube.Token == "" {
 		return cfg, ErrMissingYoutubeToken
+	}
+
+	if len(cfg.Covers.Colors) == 0 {
+		cfg.Covers.Colors = sources.DefaultColors()
+	}
+
+	wd, err := os.Getwd()
+	if err != nil {
+		return cfg, err
+	}
+
+	if !filepath.IsAbs(cfg.Covers.Covers) {
+		cfg.Covers.Covers = filepath.Join(wd, cfg.Covers.Covers)
+	}
+
+	if !filepath.IsAbs(cfg.Covers.Fonts) {
+		cfg.Covers.Fonts = filepath.Join(wd, cfg.Covers.Fonts)
+	}
+
+	if !filepath.IsAbs(cfg.Covers.Footer) {
+		cfg.Covers.Footer = filepath.Join(wd, cfg.Covers.Footer)
 	}
 
 	return cfg, nil

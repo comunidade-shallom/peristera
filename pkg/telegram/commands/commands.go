@@ -58,6 +58,7 @@ func (h Commands) Setup(ctx context.Context, bot *telebot.Bot) error {
 	root.Handle("/exec", h.Exec)
 	root.Handle("/backup", h.Backup)
 	root.Handle("/load", h.Load)
+	root.Handle("/cover", h.Cover)
 
 	return nil
 }

@@ -26,6 +26,10 @@ bin/*
 outputs/**
 !outputs/*/.gitkeep
 
+# sources folder
+sources/**
+!sources/*/.gitkeep
+
 .env
 *.db
 *.sqlite
