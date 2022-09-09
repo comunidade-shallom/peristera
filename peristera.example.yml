@@ -114,3 +114,20 @@ description: |
   🎧 [Podcast](https://open.spotify.com/show/1Sy2sfkP3SdhBqlXiA3RYT)
   📺 [YouTube](https://www.youtube.com/c/TVSHALLOM)
   🐦 [Twitter](https://twitter.com/ib_shallom)
+
+covers:
+    footer: ./sources/footer.png
+    fonts: ./sources/fonts
+    covers: ./sources/covers
+    colors:
+        - '#000000'
+        - '#976f4e'
+        - '#4e7197'
+        - '#374f6a'
+        - '#978a4e'
+        - '#6a6137'
+        - '#24180f'
+        - '#0f1c24'
+        - '#0a1419'
+        - '#24200f'
+        - '#19160a'
