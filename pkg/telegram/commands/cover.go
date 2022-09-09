@@ -46,6 +46,14 @@ func (h Commands) Cover(tx telebot.Context) error {
 		return ErrMissingText
 	}
 
+	if size.Height == 0 {
+		size.Height = defaultSize
+	}
+
+	if size.Height == 0 {
+		size.Height = size.Width
+	}
+
 	if err := tx.Reply("Generating cover image " + size.String() + "..."); err != nil {
 		return err
 	}
