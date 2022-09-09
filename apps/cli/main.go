@@ -40,6 +40,10 @@ func main() {
 				Usage:       "define log level",
 				DefaultText: "info",
 			},
+			&cli.BoolFlag{
+				Name:  "debug",
+				Usage: "enables debug level",
+			},
 		},
 		Commands: []*cli.Command{WorkerCmd, system.SystemCmd},
 		Before:   beforeRun,
@@ -61,7 +65,7 @@ func main() {
 }
 
 func beforeRun(ctx *cli.Context) error {
-	pterm.Debug.Debugger = !ctx.Bool("debug")
+	pterm.Debug.Debugger = ctx.Bool("debug")
 
 	if !ctx.Bool("no-banner") {
 		pterm.DefaultHeader.
@@ -72,6 +76,11 @@ func beforeRun(ctx *cli.Context) error {
 	appConfig, err := config.Load(ctx.String("config"))
 
 	logLevel := ctx.String("level")
+
+	if pterm.Debug.Debugger {
+		appConfig.Logger.Level = "debug"
+		logLevel = "debug"
+	}
 
 	if appConfig.Logger.Debug(logLevel) {
 		appConfig.Debug = true

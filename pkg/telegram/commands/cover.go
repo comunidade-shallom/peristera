@@ -41,7 +41,7 @@ func (h Commands) Cover(tx telebot.Context) error {
 		return ErrMissingText
 	}
 
-	if err := tx.Reply("Generating cover..."); err != nil {
+	if err := tx.Reply("Generating cover image..."); err != nil {
 		return err
 	}
 
@@ -49,7 +49,7 @@ func (h Commands) Cover(tx telebot.Context) error {
 		return err
 	}
 
-	logger.Info().Msgf("Generating cover: %s", text)
+	logger.Info().Msgf("Generating cover image: %s", text)
 
 	return h.buildCover(tx, size, text)
 }
