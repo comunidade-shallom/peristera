@@ -46,7 +46,7 @@ func (h Commands) Cover(tx telebot.Context) error {
 		return ErrMissingText
 	}
 
-	if err := tx.Reply("Generating cover image..."); err != nil {
+	if err := tx.Reply("Generating cover image " + size.String() + "..."); err != nil {
 		return err
 	}
 
@@ -103,6 +103,10 @@ func (h Commands) buildCover(tx telebot.Context, size covers.Size, text string) 
 	photo := &telebot.Photo{
 		File:    telebot.FromReader(file),
 		Caption: text,
+	}
+
+	if err := tx.Notify(telebot.UploadingPhoto); err != nil {
+		return err
 	}
 
 	return tx.SendAlbum(telebot.Album{photo})
