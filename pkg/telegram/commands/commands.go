@@ -49,16 +49,15 @@ func (h Commands) Setup(ctx context.Context, bot *telebot.Bot) error {
 
 	adm := bot.Group()
 	adm.Use(restrictTo(h.cfg.Telegram.Admins, "admins"))
-
 	adm.Handle("/me", h.Me)
 	adm.Handle("/system", h.System)
+	adm.Handle("/cover", h.Cover)
 
 	root := bot.Group()
 	root.Use(restrictTo(h.cfg.Telegram.Roots, "roots"))
 	root.Handle("/exec", h.Exec)
 	root.Handle("/backup", h.Backup)
 	root.Handle("/load", h.Load)
-	root.Handle("/cover", h.Cover)
 
 	return nil
 }
