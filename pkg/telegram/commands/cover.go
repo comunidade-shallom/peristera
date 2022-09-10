@@ -20,38 +20,11 @@ const defaultSize = 1080
 
 func (h Commands) Cover(tx telebot.Context) error {
 	logger := h.logger(tx)
-	text := ""
 
-	var size covers.Size
-
-	replyTo := tx.Message().ReplyTo
-
-	if replyTo == nil {
-		payload := strings.TrimSpace(tx.Message().Payload)
-
-		size, text = parseCoverPayload(payload)
-	} else if replyTo.Photo != nil {
-		size = covers.Size{
-			Width:  replyTo.Photo.Width,
-			Height: replyTo.Photo.Height,
-		}
-
-		text = replyTo.Caption
-	} else {
-		text = replyTo.Text
-		size = covers.ParseSize(strings.TrimSpace(tx.Message().Payload))
-	}
+	size, text := BuildCoverParams(tx.Message())
 
 	if len(text) == 0 {
 		return ErrMissingText
-	}
-
-	if size.Height == 0 {
-		size.Height = defaultSize
-	}
-
-	if size.Height == 0 {
-		size.Height = size.Width
 	}
 
 	if err := tx.Reply("Generating cover image " + size.String() + "..."); err != nil {
@@ -133,4 +106,35 @@ func parseCoverPayload(raw string) (covers.Size, string) {
 	}
 
 	return size, strings.TrimSpace(raw)
+}
+
+func BuildCoverParams(msg *telebot.Message) (covers.Size, string) {
+	var text string
+
+	var size covers.Size
+
+	payload := strings.TrimSpace(msg.Payload)
+
+	if replyTo := msg.ReplyTo; replyTo == nil {
+		size, text = parseCoverPayload(payload)
+	} else if replyTo.Photo != nil {
+		text = replyTo.Caption
+		size = covers.Size{
+			Width:  replyTo.Photo.Width,
+			Height: replyTo.Photo.Height,
+		}
+	} else {
+		text = replyTo.Text
+		size = covers.ParseSize(payload)
+	}
+
+	if size.Width == 0 {
+		size.Width = defaultSize
+	}
+
+	if size.Height == 0 {
+		size.Height = size.Width
+	}
+
+	return size, text
 }
