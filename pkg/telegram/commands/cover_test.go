@@ -11,14 +11,14 @@ import (
 )
 
 func TestBuildCoverParams(t *testing.T) {
-	type test struct {
+	t.Parallel()
+
+	tests := []struct {
 		msg  *telebot.Message
 		size covers.Size
 		text string
 		name string
-	}
-
-	tests := []test{
+	}{
 		{
 			name: "empty payload",
 			size: covers.Size{Width: 1080, Height: 1080},
@@ -92,6 +92,7 @@ func TestBuildCoverParams(t *testing.T) {
 		current := val
 
 		t.Run(current.name, func(t *testing.T) {
+			t.Parallel()
 			size, text := commands.BuildCoverParams(current.msg)
 
 			assert.Equal(t, current.text, text)

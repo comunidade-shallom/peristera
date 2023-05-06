@@ -152,7 +152,7 @@ func (j *Jobs) jobLogger(ctx context.Context, job string) zerolog.Logger {
 		Logger()
 }
 
-func (j *Jobs) broadcast(ctx context.Context, fn MessageBuilder, opts ...interface{}) error {
+func (j *Jobs) broadcast(ctx context.Context, fn MessageBuilder, _ ...interface{}) error {
 	if len(j.cfg.Telegram.Broadcast) == 0 {
 		return ErrNoChatToBroadcast
 	}

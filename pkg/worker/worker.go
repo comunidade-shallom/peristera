@@ -2,7 +2,6 @@ package worker
 
 import (
 	"context"
-	"fmt"
 	"sync"
 
 	"github.com/comunidade-shallom/peristera/pkg/config"
@@ -103,12 +102,6 @@ func (w *Worker) TelegramWorker(ctx context.Context, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	logger := zerolog.Ctx(ctx)
-
-	w.bot.OnError = func(err error, tx telebot.Context) {
-		_ = tx.Reply(fmt.Sprintf("Error: %s", err.Error()))
-
-		logger.Error().Err(err).Msg("Bot error")
-	}
 
 	go func() {
 		logger.Info().Msg("Starting telegram bot...")

@@ -2,7 +2,6 @@ package commands
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strings"
 
@@ -32,7 +31,7 @@ func (h Commands) Load(tx telebot.Context) error {
 		return err
 	}
 
-	file, err := ioutil.TempFile(os.TempDir(), "peristera.restore.*.bak")
+	file, err := os.CreateTemp(os.TempDir(), "peristera.restore.*.bak")
 	if err != nil {
 		return err
 	}

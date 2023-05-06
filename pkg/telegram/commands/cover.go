@@ -62,16 +62,20 @@ func (h Commands) buildCover(tx telebot.Context, size covers.Size, text string) 
 		logger.Error().Err(err).Msg("Fail to generate tmp dir")
 
 		return err
-	} else {
-		logger.Debug().Msgf("Temp file created: %s", file.Name())
 	}
+
+	logger.Debug().Msgf("Temp file created: %s", file.Name())
 
 	defer file.Close()
 	defer os.Remove(file.Name())
 
-	png.Encode(file, cover.Build())
+	if err = png.Encode(file, cover.Build()); err != nil {
+		logger.Error().Err(err).Msg("Fail to encode cover")
 
-	if err := file.Sync(); err != nil {
+		return err
+	}
+
+	if err = file.Sync(); err != nil {
 		return err
 	}
 

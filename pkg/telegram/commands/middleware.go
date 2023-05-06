@@ -3,13 +3,13 @@ package commands
 import (
 	"strconv"
 
+	"github.com/comunidade-shallom/peristera/pkg/telegram"
 	"github.com/rs/zerolog"
 	"gopkg.in/telebot.v3"
 )
 
 const (
-	loggerKey = "logger"
-	menuKey   = "menu"
+	menuKey = "menu"
 )
 
 func useLogger(parent zerolog.Logger) telebot.MiddlewareFunc {
@@ -17,11 +17,11 @@ func useLogger(parent zerolog.Logger) telebot.MiddlewareFunc {
 		return func(tx telebot.Context) error {
 			logger := parent.With().
 				Str("message_id", strconv.Itoa(tx.Message().ID)).
-				Str("sender_id", strconv.FormatInt(tx.Sender().ID, 10)). //nolint:gomnd
-				Str("chat_id", strconv.FormatInt(tx.Chat().ID, 10)).     //nolint:gomnd
+				Str("sender_id", strconv.FormatInt(tx.Sender().ID, 10)).
+				Str("chat_id", strconv.FormatInt(tx.Chat().ID, 10)).
 				Logger()
 
-			tx.Set(loggerKey, logger)
+			tx.Set(telegram.LoggerKey, logger)
 
 			cmd := tx.Message().Text
 
@@ -53,7 +53,7 @@ func restrictTo(ids []int64, role string) telebot.MiddlewareFunc {
 				}
 			}
 
-			logger := tx.Get(loggerKey).(zerolog.Logger) //nolint:forcetypeassert
+			logger := tx.Get(telegram.LoggerKey).(zerolog.Logger) //nolint:forcetypeassert
 
 			logger.Warn().Msg("Rejecting command from non " + role)
 

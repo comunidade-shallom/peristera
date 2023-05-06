@@ -6,6 +6,7 @@ import (
 	"github.com/comunidade-shallom/peristera/pkg/config"
 	"github.com/comunidade-shallom/peristera/pkg/database"
 	"github.com/comunidade-shallom/peristera/pkg/support/errors"
+	"github.com/comunidade-shallom/peristera/pkg/telegram"
 	"github.com/comunidade-shallom/peristera/pkg/ytube"
 	"github.com/rs/zerolog"
 	"gopkg.in/telebot.v3"
@@ -35,6 +36,7 @@ func (h Commands) Setup(ctx context.Context, bot *telebot.Bot) error {
 		bot.Use(middleware.Logger())
 	}
 
+	bot.Use(middleware.Recover())
 	bot.Use(useLogger(logger))
 
 	_, err := h.registerMenu(ctx, bot)
@@ -144,7 +146,7 @@ func (h Commands) registerCommands(ctx context.Context, bot *telebot.Bot) error 
 }
 
 func (h Commands) logger(tx telebot.Context) zerolog.Logger {
-	return tx.Get(loggerKey).(zerolog.Logger) //nolint:forcetypeassert
+	return tx.Get(telegram.LoggerKey).(zerolog.Logger) //nolint:forcetypeassert
 }
 
 func (h Commands) menu(tx telebot.Context) *telebot.ReplyMarkup {

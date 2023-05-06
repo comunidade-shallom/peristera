@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"context"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"time"
 
@@ -23,7 +22,7 @@ func noop() {}
 func Backup(ctx context.Context, db database.Database) (*os.File, DestroyBackup, error) {
 	logger := zerolog.Ctx(ctx)
 
-	file, err := ioutil.TempFile(os.TempDir(), "peristera.*.bak")
+	file, err := os.CreateTemp(os.TempDir(), "peristera.*.bak")
 	if err != nil {
 		return file, noop, err
 	}

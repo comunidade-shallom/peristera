@@ -1,14 +1,15 @@
 package support
 
 import (
-	"math/rand"
-	"time"
+	"crypto/rand"
 )
 
-func init() { //nolint:gochecknoinits
-	rand.Seed(time.Now().UnixNano())
-}
-
 func RandBool() bool {
-	return rand.Intn(2) == 1 //nolint:gomnd,gosec
+	var randomInt int64
+
+	randomBytes := make([]byte, 1)
+	_, _ = rand.Read(randomBytes)
+	randomInt = int64(randomBytes[0])
+
+	return randomInt%2 == 0
 }

@@ -53,7 +53,7 @@ func (d Database) Load(r io.Reader) error {
 }
 
 // MissingKeys return missing keys in database.
-func (d Database) MissingKeys(ctx context.Context, keys [][]byte) ([][]byte, error) {
+func (d Database) MissingKeys(_ context.Context, keys [][]byte) ([][]byte, error) {
 	out := make([][]byte, 0)
 
 	err := d.DB().View(func(txn *badger.Txn) error {
