@@ -17,6 +17,6 @@ task build
 
 ### Requeriments
 
-- [Go ~> 1.18](https://go.dev/dl/)
+- [Go ~> 1.20](https://go.dev/dl/)
 - [Task v3](https://taskfile.dev/)
 - [upx](https://upx.github.io/)

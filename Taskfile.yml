@@ -44,6 +44,13 @@ tasks:
       - install:lint
       - install:gofumpt
 
+  update:
+    desc: Update dependencies
+    cmds:
+      - go get -u ./...
+      - go mod tidy
+      - go mod vendor
+
   run:cli:
     desc: Run CLI
     cmds:
