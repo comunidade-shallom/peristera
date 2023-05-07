@@ -51,7 +51,7 @@ tasks:
       - go mod tidy
       - go mod vendor
 
-  run:cli:
+  run:
     desc: Run CLI
     cmds:
       - go run ./apps/cli/ {{.CLI_ARGS}}
